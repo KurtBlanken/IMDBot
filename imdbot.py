@@ -4,7 +4,7 @@ from threading import Thread
 import NLU, Planner, NLG
 
 server = False
-if sys.argv[1] == 'server':
+if len(sys.argv) > 1 && sys.argv[1] == 'server':
 	server = True
 	try:
 		os.remove('/tmp/imdbot_pid')
