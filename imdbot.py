@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import os, sys
 from threading import Thread
+import subprocess
 import NLU, Planner, NLG
 
 server = False
@@ -28,7 +29,14 @@ while 1:
 	else:
 		id = 'console'
 	utterance = sys.stdin.readline().strip()
-	utterance = NLG.get_utterance(id, Planner.get_knowledge_or_question(id, NLU.get_meaning(utterance)))
+	if 'uptime' in utterance:
+		utterance = subprocess.Popen(["uptime"], stdout=subprocess.PIPE).communicate()[0].strip()
+	elif 'hostname' in utterance:
+		utterance = subprocess.Popen(["hostname"], stdout=subprocess.PIPE).communicate()[0].strip()
+	elif 'date' in utterance:
+		utterance = subprocess.Popen(["date"], stdout=subprocess.PIPE).communicate()[0].strip()
+	else:
+		utterance = NLG.get_utterance(id, Planner.get_knowledge_or_question(id, NLU.get_meaning(utterance)))
 	sys.stdout.write(utterance + '\n')
 	sys.stdout.flush()
 	
