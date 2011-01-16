@@ -8,6 +8,7 @@ tagger_file.close()
 contractions = {
 	"'s" : 'is',
 	"n't" : 'not'
+	"'re" : 'are'
 }
 
 def uncontract(word):
