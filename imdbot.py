@@ -2,6 +2,7 @@
 import os, sys
 from threading import Thread
 import subprocess
+import json
 import NLU, Planner, NLG
 
 server = False
@@ -28,16 +29,17 @@ while 1:
 		id = sys.stdin.readline().strip()
 	else:
 		id = 'console'
-	utterance = sys.stdin.readline().strip()
-	if 'uptime' in utterance:
-		utterance = subprocess.Popen(["uptime"], stdout=subprocess.PIPE).communicate()[0].strip()
-	elif 'hostname' in utterance:
-		utterance = subprocess.Popen(["hostname"], stdout=subprocess.PIPE).communicate()[0].strip()
-	elif 'date' in utterance:
-		utterance = subprocess.Popen(["date"], stdout=subprocess.PIPE).communicate()[0].strip()
-	else:
-		utterance = NLG.get_utterance(id, Planner.get_knowledge_or_question(id, NLU.get_meaning(utterance)))
-	sys.stdout.write(utterance + '\n')
+	user_utterance = sys.stdin.readline().strip()
+	meaning = NLU.get_meaning(user_utterance)
+	response = Planner.get_response(id, meaning)
+	utterance = NLG.get_utterance(id, response)
+	result = json.dumps({
+		'id' : id,
+		'user_utterance' : user_utterance,
+		'meaning' : meaning,
+		'response' : response,
+		'utterance' : utterance})
+	sys.stdout.write(result + '\n')
 	sys.stdout.flush()
 	
 os.remove('/tmp/imdbot_pid')

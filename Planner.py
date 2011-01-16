@@ -1,2 +1,2 @@
-def get_knowledge_or_question(id, meaning):
+def get_response(id, meaning):
 	return meaning
