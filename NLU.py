@@ -7,7 +7,7 @@ tagger_file.close()
 
 contractions = {
 	"'s" : 'is',
-	"n't" : 'not'
+	"n't" : 'not',
 	"'re" : 'are'
 }
 
