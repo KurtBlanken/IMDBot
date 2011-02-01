@@ -29,18 +29,24 @@ def entity_recognition(tagged_words):
 # Replace named entities with object/class label to form meta-sentence
 # Return act classification, along with any extra info
 def classify_dialog_act(tagged_words, entities):
+	return
 	from nltk.corpus import names
 	import random
 	names = ([(name, 'male') for name in names.words('male.txt')] +
 					 [(name, 'female') for name in names.words('female.txt')])
 	random.shuffle(names)
 	def gender_features(word):
-		return {'last_letter' : word[-1]}
+		return {'last_letter' : ord(word[-1])}
 	featuresets = [(gender_features(n), g) for (n,g) in names]
 	train_set, test_set = featuresets[500:], featuresets[:500]
 	classifier = nltk.NaiveBayesClassifier.train(train_set)
-	print classifier.classify(gender_features("Fred"))
+	print classifier.classify(gender_features("Neo"))
 	print classifier.classify(gender_features("Trinity"))
+	from nltk.classify.weka import WekaClassifier as Weka
+	nltk.classify.weka.config_weka(classpath='/usr/share/java/weka.jar')
+	weka = Weka.train('weka.model', train_set, classifier='naivebayes')
+	print weka.classify(gender_features("Neo"))
+	print weka.classify(gender_features("Trinity"))
 	
 def get_meaning(utterance):
 	# uncontract and tokenize utterance

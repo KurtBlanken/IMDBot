@@ -3,7 +3,7 @@ import os, sys
 from threading import Thread
 import subprocess
 import json
-import NLU, Planner, NLG
+import NLU, DM, NLG
 
 server = False
 if len(sys.argv) > 1 and sys.argv[1] == 'server':
@@ -24,14 +24,28 @@ if len(sys.argv) > 1 and sys.argv[1] == 'server':
 	_, w = os.pipe()
 	sys.stdout = os.fdopen(w, 'w')
 
+if not server:
+	import readline
+	try:
+		  readline.read_history_file('hist')
+	except IOError:
+		  pass
+	import atexit
+	atexit.register(readline.write_history_file, 'hist')
+	print DM.get_introduction()
 while 1:
 	if server:
 		id = sys.stdin.readline().strip()
+		user_utterance = sys.stdin.readline().strip()
 	else:
 		id = 'console'
-	user_utterance = sys.stdin.readline().strip()
+		try:
+			user_utterance = raw_input('> ')
+		except EOFError:
+			print "\ngoodbye"
+			sys.exit(0)
 	meaning = NLU.get_meaning(user_utterance)
-	response = Planner.get_response(id, meaning)
+	response = DM.get_response(id, meaning)
 	utterance = NLG.get_utterance(id, response)
 	result = json.dumps({
 		'id' : id,
