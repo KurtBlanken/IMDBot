@@ -1,10 +1,5 @@
 import nltk
-import cPickle
-
-# Saved tagger
-tagger_file = open('tagger.pkl', 'rb')
-tagger = cPickle.load(tagger_file)
-tagger_file.close()
+from Ontology import *
 
 contractions = {
 	"'s" : 'is',
@@ -23,43 +18,33 @@ def uncontract(word):
 # Query the database for named entities associated with tagged sentence
 # Return a list of entities
 def entity_recognition(tagged_words):
-	return []
+	entities = set()
+	for word, tag in tagged_words:
+		entity = find_entity(word, tag, tagged_words)
+		if entity != None:
+			entities.add(entity)
+	return entities
 
 # Classify the dialog act of a sentence
 # Replace named entities with object/class label to form meta-sentence
 # Return act classification, along with any extra info
 def classify_dialog_act(tagged_words, entities):
-	return
-	from nltk.corpus import names
-	import random
-	names = ([(name, 'male') for name in names.words('male.txt')] +
-					 [(name, 'female') for name in names.words('female.txt')])
-	random.shuffle(names)
-	def gender_features(word):
-		return {'last_letter' : ord(word[-1])}
-	featuresets = [(gender_features(n), g) for (n,g) in names]
-	train_set, test_set = featuresets[500:], featuresets[:500]
-	classifier = nltk.NaiveBayesClassifier.train(train_set)
-	print classifier.classify(gender_features("Neo"))
-	print classifier.classify(gender_features("Trinity"))
-	from nltk.classify.weka import WekaClassifier as Weka
-	nltk.classify.weka.config_weka(classpath='/usr/share/java/weka.jar')
-	weka = Weka.train('weka.model', train_set, classifier='naivebayes')
-	print weka.classify(gender_features("Neo"))
-	print weka.classify(gender_features("Trinity"))
+	return 'pref'
 	
-def get_meaning(utterance):
+def NLU(data):
 	# uncontract and tokenize utterance
-	words = [uncontract(word) for word in nltk.word_tokenize(utterance)]
+	words = [uncontract(word) for word in nltk.word_tokenize(data['user_utterance'])]
 	# tag words with saved tagger
 	tagged_words = tagger.tag(words)
 	# get any recognized entities
 	entities = entity_recognition(tagged_words)
 	# classify the dialog act
 	act = classify_dialog_act(tagged_words, entities)
-	return {
-		'utterance' : utterance,
-		'tagged_words' : tagged_words,
-		'entities' : entities,
-		'act' : act,
-	}
+	data['tagged_words'] = tagged_words
+	data['entities'] = entities
+	data['act'] = act
+	if act == 'pref':
+		add_preferences(data)
+
+def add_preferences(data):
+	data['prefs'] = data['prefs'].union(data['entities'])

@@ -44,15 +44,19 @@ while 1:
 		except EOFError:
 			print "\ngoodbye"
 			sys.exit(0)
-	meaning = NLU.get_meaning(user_utterance)
-	response = DM.get_response(id, meaning)
-	utterance = NLG.get_utterance(id, response)
-	result = json.dumps({
+	data = {
 		'id' : id,
 		'user_utterance' : user_utterance,
-		'meaning' : meaning,
-		'response' : response,
-		'utterance' : utterance})
+		'prefs' : set(),
+		'errors' : [],
+	}
+	NLU.NLU(data)
+	DM.DM(data)
+	NLG.NLG(data)
+	for key, value in data.items():
+		if type(value) == type(set()):
+			data[key] = list(value)
+	result = json.dumps(data)
 	sys.stdout.write(result + '\n')
 	sys.stdout.flush()
 	

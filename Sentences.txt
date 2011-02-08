@@ -1,0 +1,539 @@
+﻿//MovienatorUtterances.txt
+I like slapstick comedies.
+I like CLASS
+PREF
+Show me some 80's movies that are good.
+Show me some 80’s CLASS that are good
+REC
+What do you think was Bill Murray's best movie?
+What do you think was OBJECT’s best CLASS
+TRIV
+Was the sword heavy in Conan?
+Was the sword heavy in OBJECT
+TRIV
+Danny Devito is funny.
+OBJECT is funny
+PREF
+I like racing car movies like "Gone in 60 Seconds."
+I like racing car CLASS like OBJECT
+PREF
+What about something racy with Nicole Kidman?
+What about something racy with OBJECT
+PREF REC
+What do you recommend that is set in NYC?
+What do you recommend that is set in OBJECT
+REC
+How about something that involves international spies?
+ 
+PREF REC
+I would be interested in a political documentory.
+I would be interested in a political CLASS
+PREF
+Are you really a robot?
+ 
+CHAT
+Show me a movie where you saved the world.
+Show me a CLASS where you saved the world
+PREF CHAT
+I feel like a scary movie for Halloween.
+I feel like a scary CLASS for Halloween
+PREF
+Do you know anything about Scrooge or the Grinch?
+Do you know anything about OBJECT or the OBJECT
+TRIV
+I prefer the classics, with some dancing too.
+ 
+CHAT
+Is there any good movies out there?
+Is there any good CLASS out there
+REC
+What is something recent I haven't seen?
+ 
+ 
+Do you know of any good dark comedies?
+Do you know of any good dark CLASS
+REC
+I'm bored, show me anything unusual, like different.
+ 
+REC
+I like to surf, dude, show me what you got!
+ 
+REC
+I feel like a comedy today.
+I feel like a CLASS today
+PREF
+No, but I think I'd like one with Seth Rogen.
+I think I would like one with OBJECT
+PREF
+Can I see the top three recommendations?
+ 
+REC
+Between "The Pineapple Express" and "The Green Hornet", which movie had the better rating?
+Between OBJECT and OBJECT which CLASS had the better rating
+INFO
+Nevermind, I think I want a romance instead.
+I want a CLASS instead
+PREF
+Can you find me one that was made in the nineties?
+Can you find me CLASS that was made in the nineties?
+PREF
+How about one with Sandra Bullock? She won an academy award so maybe I should check out some of her earlier movies.
+ 
+ 
+Actually, I don't want a movie with Sandra Bullock.
+I do not want a movie with OBJECT
+PREF
+No, but I want that is animated as well.
+I want that is CLASS as well
+PREF
+What's the top recommendation?
+ 
+REC
+Hmmmm, how about one from the 2000s?
+How about CLASS from the 2000s
+PREF
+"Tangled" sounds good, is it out on DVD or still in theatres?
+ 
+MULTI
+Still in theatres . . . okay how about an action movie then?
+how about an action CLASS then
+PREF REC
+Okay you've convinced me, the Terminator sounds good. However, can I see a list of all the Terminator movies?
+ 
+INFO
+Out of all the Terminator movies which one had the best rating?
+Out of all the OBJECT which one had the best CLASS?
+INFO
+On second thought, can you give me a list of all the "Predator" movies?
+Give me a list of all the CLASS movies?
+REC
+Can you give me a list in terms of rating?
+Give me a list in terms of CLASS?
+REC
+I think that "Predators" looks good, is it out on DVD?
+I think that OBJECT looks good, is it out on DVD?
+PREF
+Great, now just for fun. Which movie is the worst "Predator" movie?
+Which movie is the worst CLASS movie?
+INFO
+When was that movie made?
+When was OBJECT made?
+INFO
+What is a good action movie?
+What is a good CLASS movie?
+REC
+I dont like romantic movies.
+I don’t like CLASS movies.
+REC
+Which actors are in Inception?
+Which CLASS are in OBJECT?
+TRIV
+What are the top 5 horror movies?
+What are the top 5 CLASS movies?
+INFO
+What was Tom Hank's first film?
+What was OBJECT’s CLASS film?
+TRIV
+I want to watch a sci-fi movie, but not one with Nathan Fillion.
+I want to watch a CLASS movie, but not one with OBJECT.
+PREF
+What movies have Jackie Earle Haley in them?
+What movies have OBJECT IN them?
+TRIV
+What year did "Psycho" come out?
+What year did OBJECT come out?
+INFO
+I want to watch a movie with Adam Sandler but not Rob Schneider.
+I want to watch a CLASS with OBJECT but not OBJECT
+PREF
+Who directed "Black Hawk Down"?
+Who directed OBJECT
+INFO
+What is "Funny People" about?
+What is OBJECT about
+TRIV
+List Michael Moore documentaries
+List OBJECT CLASS
+INFO
+How long is the movie?
+How long is the CLASS
+INFO
+What is the movie's runtime?
+What is the CLASS’s runtime
+INFO
+What is the top rated movie of the year?
+What is the top rated CLASS of the year
+TRIV
+Who starred in "Predator"?
+Who starred in OBJECT
+INFO
+Whats a scary movie not about ghosts?
+Whats a scary CLASS not about ghosts
+TRIV
+What is Steven Spielberg's most recent movie?
+What is OBJECT’s most recent CLASS
+INFO
+What is the latest movie starring both Seth Rogen and Jason Segel?
+What is the latest CLASS starring both OBJECT and OBJECT
+TRIV
+How many movies have Meg Ryan and Tom Hanks been in together?
+How many CLASS have OBJECT and OBJECT been in together 
+TRIV
+I like movies with Christian Bale.
+I like CLASS with OBJECT 
+PREF
+Show me movies by the same director as "Inception".
+Show me CLASS by the same CLASS as OBJECT
+INFO
+How many "Die Hard" movies are there?
+How many OBJECT CLASS are there
+TRIV
+How do you like governating California?
+ 
+CHAT
+Got a movie that's both action and romance?
+Got a CLASS that’s both CLASS and CLASS
+REC
+How about romance and sci-fi?
+How about CLASS and CLASS
+REC
+I loved "Lord of the Rings".
+I loved OBJECT
+PREF
+Give me some movies with some hot babes.
+Give me some CLASS with some hot babes
+PREF
+Who directed "Endless Waltz"?
+Who directed OBJECT
+INFO
+I'm feeling like a Miyazaki movie tonight.
+I am feeling like a OBJECT CLASS tonight
+PREF
+Which other movies have actors from "Star Wars"?
+Which other CLASS have CLASS from OBJECT
+TRIV
+Was there ever a "Babylon 5" movie?
+Was there ever a OBJECT CLASS
+TRIV
+I need a Christmas movie that doesn't suck.
+I need a Christmas CLASS that does not suck
+PREF
+Did Terintino act in all of the movies he directed?
+Did OBJECT act in all of the CLASS he directed
+TRIV
+Dance for me.
+ 
+CHAT
+Suggest a movie for me, Arnold.
+ 
+REC
+I've got a buddy who really likes blacksploitation films.
+I have got a buddy who really likes blacksploitation CLASS
+PREF
+Who stared in "Fight Club"?
+Who starred in OBJECT
+INFO
+When did "Disco Fever" come out?
+When did OBJECT come out
+TRIV
+That last movie you suggested just wasn't metal enough.
+That last CLASS you suggested just was not CLASS enough
+PREF
+Hey, what is your favorite movie?
+ 
+CHAT
+Hey.
+ 
+CHAT
+Hello moto.
+ 
+CHAT
+Why do you recommend this movie?
+Why do you recommend this CLASS
+OTHER
+@!&~^+#()$&*_+`WTFLOL
+ 
+CHAT
+How do you spell your last name?
+ 
+CHAT
+Tell me a little about yourself.
+ 
+CHAT
+Can you think?
+ 
+CHAT
+Are you alive?
+ 
+CHAT
+What do you recommend?
+ 
+REC
+What movie is "It's not a tumor" from?
+What CLASS is “It’s not a tumor” from
+TRIV
+I'm looking for a movie with George Clooney in a tight suit.
+I am looking for a CLASS with OBJECT in a tight suit
+PREF
+I like movies with Kevin Bacon in them.
+I like CLASS with OBJECT in them
+PREF
+To be, or not to be? That is the question.
+ 
+CHAT
+I was hoping you could tell me more about the movie Inception.
+I was hoping you could tell me more about the CLASS OBJECT
+TRIV
+Do you know who starred in the film "Joe Vs. The Volcano"?
+Do you know who starred in the CLASS OBJECT
+TRIV
+What is the movie "Super Mario Bros" about?
+What is the CLASS OBJECT about
+TRIV
+How much did "Avatar" cost to make?
+How much did OBJECT cost to make
+TRIV
+What language is "The Girl with the Dragon Tattoo" in?
+What language is OBJECT in
+TRIV
+What awards did the movie "Up" receive?
+What CLASS did the CLASS OBJECT receive
+TRIV
+Was Catherine Zeta Jones in Entrapment?
+Was OBJECT in OBJECT
+INFO
+Who was in Entrapment?
+Who was in OBJECT
+INFO
+What is the plot of Entrapment?
+What is the OBJECT of OBJECT
+INFO
+I liked Entrapment and Ocean’s 11.
+I liked OBJECT and OBJECT
+PREF
+Give me a recommendation.
+ 
+REC
+Got a recommendation?
+ 
+REC
+Ocean’s 12 sucked.
+OBJECT sucked
+PREF
+Kevin Smith’s films are usually good.
+OBJECT’s CLASS are ususally good
+PREF
+Chick flicks are boring.
+CLASS are boring
+PREF
+Who is Aaron Sorkin?
+Who is OBJECT
+TRIV
+Is Bruce Willis in any non-action movies?
+Is OBJECT in any non-CLASS CLASS
+TRIV
+Which is better, Die Hard or Die Hard 2?
+Which is better, OBJECT or OBJECT
+TRIV
+What are the 10 best animated films?
+What are the 10 best CLASS CLASS
+TRIV
+Who is similar to Jackie Chan?
+Who is similar to OBJECT
+TRIV
+How many movies has he been in?
+How many CLASS has OBJECT been in
+TRIV
+Where is he from?
+Where is OBJECT from
+TRIV
+What has John Williams been up to?
+When did the original True Grit come out?
+I’m looking for something fun, like The Incredibles.
+What are the most famous movies Korngold composed?
+What are the Mad Max movies?
+What is a really sad movie?
+What movies are coming out this weekend?
+I’m looking for a silly movie I can laugh at.
+Can you list all the Pixar movies?
+How long is The Day the Earth Stood Still?
+What is the highest rated movie by the guy who made Ran?
+What is your favorite movie?
+I really like Batman.
+*What animated movies has he been in?
+*Who voiced him in those movies?
+Where does Batman live?
+*Do you like him?
+How many movies has James Cameron directed?
+Who composed the score for The Lord of the Rings?
+Who was the first James Bond?
+I’m interested in documentaries, what can you recommend me?
+I want to watch the newest action movie available on DVD.
+Is Inception out on DVD yet?
+Where can I watch Pirates of the Caribbean?
+Where can I watch the trailer for Sanctum?
+I want to watch a movie from the 80’s.
+Where was Superbad filmed?
+Show me a list of funny movies with a PG-13 rating and below.
+What do most people prefer, action or drama?
+What is the first movie George Lucas directed?
+Is Lady Gaga in any movies?
+My friend told me to watch The Hangover, what can you tell me about it?
+What is the first Starwars movie about?
+Who did the voice of Woody in Toy Story?
+Is The Terminator available in German?
+Did Titanic win any awards?
+Where are most U.S. films made?
+I liked Nicolas Cage in National Treasure.
+*I want to see more similar movies.
+*Find a movie I would like.
+*What happened in this movie?
+I hate Disney films but want an animated film to watch.
+I think Jim Carrey is a great actor.
+I want an action film to watch.
+Recommend me a comedy film.
+What movies was Arnold Schwarzenegger in?
+Daniel Craig is a great actor.
+I like horror films.
+What is The Wedding Crashers about?
+What’s a good movie to watch?
+I like movies directed by Alfred Hitchcock.
+I saw the first Lord of the Rings and liked it.
+Tell me more about The next Lord of the Rings movie.
+Was Sandra Bullock starred in any movies that is not a romantic comedy.
+I’ve already seen this movie and did not like it.
+recommend me another movie.
+My favorite actress is Natalie Portman.
+What movies won academy awards in 2010.
+Who was the male lead of Gladiator.
+Where was Lord of the Rings filmed?
+Return of the Jedi is my favorite movie.
+What are some movies starring Seth Rogen?
+*Which one of these is the best?
+I love Star Wars.
+I hate Star Trek.
+*What are some movies I would like?
+What is Pirates of the Caribbean: The Curse of the Black Pearl about?
+What movies were directed or written by Christopher Nolan?
+Was Inception directed by Christopher Nolan?
+I like movies from the 1950’s.
+*Recommend me a movie from that time.
+How many movies is Harrison Ford in?
+*Which of those is the most recent?
+What is The Godfather about?
+Was Sam Worthington in Avatar?
+Who starred in Independence Day?
+Will Smith is my favorite actor.
+*What’s a movie I would like?
+I only watch super hero movies.
+*What’s a good movie that’s not like those?
+ 
+// corpus_utterances.txt
+I would like to watch a movie, do you know where I can rent one I will like?
+I would like to see a movie with Harrison Ford and Julia Roberts.
+I only like movies with Clint Eastwood as the director.
+I like some movies directed by Sergio Leone.
+I do not like Sydney Pollack.
+Can you show me movies directed by Jonathan Demme?
+My favorite genre is action comedy.
+How many movies has Michael Curtiz directed?
+Can you show me a movie I would like?
+I do not like that one, can you show me another?
+Can you recommend a comedy?
+I would like something with action in it as well.
+Show me all movies with Robert Dinero.
+Which of those have Al Pacino?
+Can you suggest something good?
+I am feeling sad, what kind of movie would you recommend?
+I watched Star Wars A New Hope and really liked it, are there any other movies like it?
+Can you show me horror films from the 1950s?
+Where can I find a copy of Plan 9 From Outer Space near me?
+Can you show me movies that I have liked in the past?
+I'd like to find an action movie
+Tell me the cast list of Inception
+I like movies with Bradley Whitford
+Tell me the plot of Inception
+My favorite director is Christopher Nolan
+I don't like Steven seagal
+What are the most popular movies this week?
+Can you recommend me a romance movie like titanic?
+What are the top rating movies of all time?
+I want a horror movie that is not bloody or disgusting
+Tell me the top 10 movies of 2009
+Who is the director of the movie Inception
+I like Julia
+It is Julia Roberts
+I hate romance movies
+I dislike action movies
+I think Mr. Nolan is a great director.
+Who has starred in the most movies?
+What was the worst movie ever?
+I like movies like God Father or The load of the rings
+I thought the plot was okay, but the acting sucked.
+I got bored
+Toy story 3 was really fun
+It was okay.
+Leonardo dicaprio is a good actor
+I'm looking for a movie with vampires
+I'm looking for a bad man movie
+I'm wondering if the movie is released on dvd
+I would like to find a movie with lots of action.
+I also want the movie to be recent.
+That's right.
+No, that's not what I meant.
+Can you show me more movies?
+I don't care.
+Cancel that.
+Which movie is the longest?
+Go back.
+That question doesn't make sense.
+Start a new search.
+Can we start over?
+Can you show me the most popular movies recently?
+I want to see a list of 10 movies.
+I like action more than romance.
+Which movie has better reviews?
+Can you add Inception to the list?
+What else is there?
+Can you only show movies from this year?
+Can you remove all the movies from previous years?
+No, I don't like war movies.
+Can you make a recommendation?
+Choose one for me.
+I think they're both ok.
+Is this movie appropriate for children?
+I don't want animated movies.
+Is this movie for kids?
+Is this movie scary?
+Is that a chick flick?
+I don't want any of these movies.
+I like movies with romance and not that much action.
+What's Ocean's 11 about?
+Is George Clooney also in Ocean's 13?
+What movies did Steven Segal direct?
+Romantic movies are boring
+I like Mark Walberg but not Matt Damon
+I don't like movies with Jennifer Gardner
+Are there other action movies like Heat?
+Who directed the older Ocean's 11?
+Was Chris Rock in any recent movies?
+How many movies was Keanu Reeves in?
+How many matrix movies are there?
+I hate the matrix
+Are there other movies that are similar to Inception?
+What is the latest movie that Michael Bay directed?
+Did Michael Bay direct Armageddon
+What was Meet The Parents about?
+Is legally blonde a comedy?
+What is iRobot rated?
+Was Will Smith in iRobot?
+This is boring
+Are you a robot?
+I want to see some comedy
+I don't really like dramas
+Please, no killing.
+I want to watch some PG-13 movies.
+Who directed Twilight?
+How many versions of Ocean's 11 are there?
+Okay
+James Cameron
