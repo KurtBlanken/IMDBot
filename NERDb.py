@@ -13,7 +13,6 @@ ratio(string1, string2)
     The similarity is a number between 0 and 1, it's usually equal or
     somewhat higher than difflib.SequenceMatcher.ratio(), because it's
     based on real minimal edit distance.
-
 '''
 
 def insert(s, i, d):
@@ -71,8 +70,8 @@ chunker = UnigramChunker()
 tagger = nltk.UnigramTagger(nltk.corpus.treebank.tagged_sents())
 	
 sentences = [
-	"What do you think was Bill Murray's best movie?",
-	"Danny Devito is funny.",
+	"What movies have Bill Murray and Danny DeVito been in together?",
+	"Danny DeVito is funny.",
 	#"I like racing car movies like Gone in 60 Seconds.",
 	"What about something with Nicole Kidman?",
 ]
@@ -107,7 +106,7 @@ for sentence in sentences:
 		ratios.sort(key=lambda x: x[0], reverse=True)
 		if len(ratios) > 0:
 			r, id, actor = ratios[0]
-			matches[pair] = { 'id' : id, 'name' : actor, 'class' : 'ACTOR' }
+			matches[pair] = { 'id' : id, 'name' : actor, 'class' : 'actor' }
 	for match in matches:
 		first, last = match
 		name = first + ' ' + last

@@ -79,6 +79,9 @@ def get_cast_info(id):
 		return d['nr_order']
 	cast_info.sort(key=keyfn)
 	return cast_info
+	
+def get_person(id):
+	pass
 
 def add_res_to_dict(col_names, res, d):
 	for k, v in zip(col_names, res):
@@ -93,11 +96,10 @@ def add_res_to_dict(col_names, res, d):
 titles = [line.split(' ', 1) for line in open('title_index.txt').readlines()]
 for id, title in titles:
 	m = get_movie(id)
-	if 'actors' in m and len(m['actors']) > 0:
-		lead = m['actors'][0]
+	if 'actresses' in m and len(m['actresses']) > 0:
+		lead = m['actresses'][0]
 		print lead['person_id'], lead['name']
 '''
-
 
 '''
 for id, title in titles:
