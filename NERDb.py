@@ -111,4 +111,4 @@ for sentence in sentences:
 	for match in matches:
 		first, last = match
 		name = first + ' ' + last
-		print sentence.replace(name, matches[match]['class'])
+		print sentence.replace(name, '(' + matches[match]['class'] + ' ' + matches[match]['id'] + ')')
