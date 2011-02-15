@@ -4,7 +4,7 @@ genre_types = [
 	'comedy', 'action', 'adventure', 'animation', 'biography', 'crime',
 	'documentary', 'drama', 'family', 'fantasy', 'noir', 'horror',
 ]
-relationship_types = ['in', 'attrib']
+relationship_types = ['in', 'attr']
 
 import cPickle
 # Saved tagger

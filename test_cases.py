@@ -21,6 +21,28 @@ output = [
 ]
 
 # utterance
+utterance = 'Was Matt Damon in Armageddon?'
+# NLU output / dialog manager input
+nlu_dm = {	'act' : 'trivia',
+	'trivias' : [
+		{	'attr' : 'in',
+			'entities' : [('person', 260886), ('movie', 48368)],
+		}]
+}
+# dialog manager output / NLG input
+dm_nlg = {	'act' : 'trivia',
+	'trivias' : [
+		{	'attr' : 'in',
+			'entities' : [('person', 260886), ('movie', 48368)],
+			'answer' : False,
+		}]
+}
+output = [
+	'No.',
+	"I don't think so.",
+]
+
+# utterance
 utterance = 'I think Danny DeVito is hilarious'
 # NLU output / dialog manager input
 nlu_dm = {	'act' : 'pref',
