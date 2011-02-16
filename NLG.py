@@ -14,6 +14,7 @@ def NLG(data):
 		data['output'] = "I don't know"
 		
 def handle_pref(data):
+	data['output']= ''
 	if not data['errors']:
 		for entity in data['entities']:
 			if entity[0] == 'genre':

@@ -2,9 +2,6 @@ import nltk, re
 import Levenshtein as lev
 
 
-
-
-
 ''' Levenshtein examples:
 jaro(string1, string2)
 
@@ -122,7 +119,13 @@ def getEntities(sentence):
 			if len(ratios) > 0:
 				r, id, actor = ratios[0]
 				matches[pair] = {'id':id, 'name': actor, 'class': 'actor'}
-	return matches
+	
+	result=[]
+	for match in matches:
+		if matches[match]['class']== 'actor':
+			result.append(('person', matches[match]['id']))
+			
+	return result
 
 
 
