@@ -1,59 +1,41 @@
-#import imdb-iface
-#actually import imdb-iface when running against real database
-#test
-
-nlu_test_input = {	'act':'trivia',
-		'trivias':[
-			{	'attr':'in',
-				'entities':[('person',260886),('movie',48368)],
-			}]
-}
-
-#trivia handler, updates the data structer with answers to
-#trivia questions. takes in nlu_to_dm_test_input and then append #an answer field to the trivias dictionary.
-
-def handle_triv(data):
+'''
+  trivia handler, updates the data structer with answers to
+  trivia questions. takes in nlu_to_dm_test_input and then append an answer
+  field to the trivias dictionary.
+'''
+def handle(data):
 	for triv in data['trivias']:
 		triv['answer'] = list()
 		if triv['attr'] != '':
 			triv_type = triv['attr']
 			#'in' questions answers true/false
 			if triv_type == 'in':
-				pid = triv['entities'][0][1]
-				mid = triv['entities'][1][1]
-				triv['answer'] = pers_in_movie(pid,mid)
-                #'when' function asking for production year
-			if triv_type == 'when' and triv['entities'][0][0] == 'movie':
-				mid = triv['entities'][0][1]
-				mov = get_movie(mid)
-				triv['answer'] = mov['production_year']
+				type1, p_id = triv['entities'][0]
+				type2, m_id = triv['entities'][1]
+				if type1 == 'person' and type2 == 'movie':
+					is_person_in_movie(data, p_id, m_id)
+				else:
+					triv['answer'] = 'How can a {0} be in a {1}'.format(type1, type2)
+      #'when' function asking for production year
+			elif triv_type == 'when':
+				type, id = triv['entity']
+				if type == 'movie':
+					mov = data['imdbi'].get_movie(id)
+					triv['answer'] = mov['production_year']
+				else:
+					triv['answer'] = "I don't know about {0}s".format(type)
 		else:
 			data['errors'] = 'no attribute for trivia'
 
-
 #helper function to find if an actor/actress was in a movie
-
-def pers_in_movie(pers_id, movie_id):
-	ans = False
-	triv_movie = get_movie(movie_id)
-	if 'actors' in triv_movie.keys():
-		for actor in triv_movie['actors']:
-			if actor['person_id'] == pers_id:
-				ans = True
-	if 'actresses' in triv_movie.keys():
-		for actress in triv_movie['actresses']:
-			if actress['person_id'] == pers_id:
-				ans = True
-	return ans
-
-#delete this get_movie function when testing with imdb-iface.py
-#I couldn't connect to SQL so I couldn't fool around with your #function, so I assumed a get_movie function that returns a #simple dictionary mimicking a get_movie.
-
-def get_movie(movie_id):
-	dict = {	'movie_id':'48368',
-			'production_year':1998,
-			'actors':[{'person_id':260886,
-					'role_type':'actor',
-					'name':'Affleck, Ben'}],}
-	return dict
-
+def is_person_in_movie(data, p_id, m_id):
+	data['answer'] = False
+	movie = data['imdbi'].get_movie(m_id)
+	if 'actors' in movie:
+		for actor in movie['actors']:
+			if actor['person_id'] == p_id:
+				data['answer'] = True
+	elif 'actresses' in movie:
+		for actress in movie['actresses']:
+			if actress['person_id'] == p_id:
+				data['answer'] = True
