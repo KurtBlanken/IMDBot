@@ -89,7 +89,22 @@ class IMDBInterface(object):
 		return cast_info
 	
 	def get_person(self, id):
-		pass
+		self.cur.execute('SELECT * FROM name WHERE id={0}'.format(id))
+		res = self.cur.fetchall()
+		assert len(res) == 1
+		res = res[0]
+		d = {}
+		self._add_res_to_dict(self.tables['name'], res, d)
+		self.cur.execute('SELECT * FROM cast_info WHERE person_id={0}'.format(id))
+		res = self.cur.fetchall()
+		for r in res:
+			d2 = {}
+			self._add_res_to_dict(self.tables['cast_info'], r, d2)
+			if 'role_type' in d2:
+				if d2['role_type'] not in d:
+					d[d2['role_type']] = set()
+				d[d2['role_type']].add(d2['movie_id'])
+		return d
 
 	def _add_res_to_dict(self, col_names, res, d):
 		for k, v in zip(col_names, res):
