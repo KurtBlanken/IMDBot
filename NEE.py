@@ -1,10 +1,6 @@
 import nltk, re
 import Levenshtein as lev
 
-
-
-
-
 ''' Levenshtein examples:
 jaro(string1, string2)
 
@@ -55,59 +51,46 @@ def pairs(lst):
 	yield item, first
 
 
-''' This uses the UnigramChunker.
-I pickled it to make it a little faster. It's slower that the nltk ne_chunker
-but it has better chunking results
+''' 
+Uses ne_chunker
 '''
+
 
 def getEntities(sentence):
 	
-	#print sentence
 	
-	try:
-		import cPickle as pickle
-	except:
-		import pickle
+	tagged_sent= nltk.pos_tag(nltk.word_tokenize(sentence))
+	tree= nltk.ne_chunk(tagged_sent)
 	
-	fh= open('eChunker.pkl','r')
-	chunker = pickle.load(fh)
-	fh.close()
-		
-		
-	patterns = [(r'[A-Z][a-z]+','NNP'),]
-	regexp_tagger= nltk.RegexpTagger(patterns)
-	tagger = nltk.UnigramTagger(nltk.corpus.treebank.tagged_sents(), backoff=regexp_tagger )
-		
-	actors = [line.split(" ", 1) for line in open('actors_index.txt').readlines()]
-		
-	tagged_sent = tagger.tag(nltk.word_tokenize(sentence))
-	tree = chunker.parse(tagged_sent)
-		
-		
-		
+	print tagged_sent
+	
+	print tree
+	
+	
 	""" Entities is a list of lists to facilitate pairing
 	 	  with multiple entities in a sentence
 	"""
 	entities=[]
 	for subtree in tree.subtrees():
-		# get NP chunks
-		if subtree.node == 'NP':
-			nplist=[]
-			# check if NP contains any NNP 
+		if subtree.node == 'PERSON':
+			nelist=[]
 			for child in subtree:
-				name,tag= child
-				if tag == 'NNP': nplist.append(name)
-			
-			if len(nplist) > 0: entities.append(nplist)
+				name,tag = child
+				if tag == 'NNP': nelist.append(name)
+			if len(nelist) > 0: entities.append(nelist)
+		
+		
+	actors = [line.split(" ", 1) for line in open('actors_index.txt').readlines()]
+		
 	
-	#print entities
+	print entities
 		
 	matches= {}
 	for list in entities:
 		for pair in pairs(list):
 			first, last= pair
 			name= first + ' ' + last
-			#print name
+			print name
 			ratios = []
 			for id, actor in actors:
 				s= actor.strip().replace(' ', '').split(',')
@@ -123,10 +106,6 @@ def getEntities(sentence):
 				r, id, actor = ratios[0]
 				matches[pair] = {'id':id, 'name': actor, 'class': 'actor'}
 	return matches
-
-
-
-
 
 def main():
 	
