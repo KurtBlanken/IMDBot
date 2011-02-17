@@ -1,4 +1,5 @@
 import nltk
+import NERDb
 from Ontology import *
 
 contractions = {
@@ -37,7 +38,8 @@ def NLU(data):
 	# tag words with saved tagger
 	tagged_words = tagger.tag(words)
 	# get any recognized entities
-	entities = entity_recognition(tagged_words)
+	#entities = entity_recognition(tagged_words)
+	entities= NERDb.getEntities(data['user_utterance'])
 	# classify the dialog act
 	act = classify_dialog_act(tagged_words, entities)
 	data['tagged_words'] = tagged_words
