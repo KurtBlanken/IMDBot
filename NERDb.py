@@ -1,201 +1,137 @@
-import nltk, re
+import nltk
 import Levenshtein as lev
 
+class ConsecutiveNPChunker(nltk.ChunkParserI):
+	def __init__(self, tagger, chunked_sents):
+		tagged_sents = [[((w,t),c) for (w, t, c) in
+										 nltk.chunk.tree2conlltags(sent)]
+										for sent in chunked_sents]								
+		train_set = []
+		for tagged_sent in tagged_sents:
+			untagged_sent = nltk.tag.untag(tagged_sent)
+			history = []
+			for i, (word, tag) in enumerate(tagged_sent):
+				featureset = npchunk_features(untagged_sent, i, history)
+				train_set.append((featureset, tag))
+				history.append(tag)
+		labels = set(label for (tok,label) in train_set)
+		nltk.config_megam('./megam_i686.opt')
+		self.classifier = nltk.MaxentClassifier.train(train_set, algorithm='megam')
+		self.tagger = tagger
+		
+	def parse(self, sentence):
+		tagged_sent = self.tagger.tag(nltk.word_tokenize(sentence))
+		history = []
+		for i, word in enumerate(tagged_sent):
+			featureset = npchunk_features(tagged_sent, i, history)
+			tag = self.classifier.classify(featureset)
+			history.append(tag)
+		chunked_sent = zip(tagged_sent, history)
+		conlltags = [(w,t,c) for ((w,t),c) in chunked_sent]
+		return nltk.chunk.conlltags2tree(conlltags)
 
-''' Levenshtein examples:
-jaro(string1, string2)
-
-    The Jaro string similarity metric is intended for short strings like
-    personal last names.  It is 0 for completely different strings and
-    1 for identical strings.
-    
-ratio(string1, string2)
-    
-    The similarity is a number between 0 and 1, it's usually equal or
-    somewhat higher than difflib.SequenceMatcher.ratio(), because it's
-    based on real minimal edit distance.
-'''
-<<<<<<< HEAD
+def tags_since_dt(sentence, i):
+	tags = set()
+	for word, pos in sentence[:i]:
+		if pos == 'DT':
+			tags = set()
+		else:
+			tags.add(pos)
+	return '+'.join(sorted(tags))
 	
-sentences = [
-	"What movies have Bill Murray and Danny DeVito been in together?",
-	# current ne chunker fails to recognize Danny DeVito as a single person,
-	# gets Danny, but not DeVito.
-	"Danny DeVito is funny.",
-	#"I like racing car movies like Gone in 60 Seconds.",
-	"What about something with Nicole Kidman?",
-]
-
-'''
-	nltk has a default Named Entity chunker!!
-	why didn't we know about this before!?
-'''
-def extract_entities(sentence):
-	entities = {
-		'people' : []
-	}
-	for chunk in nltk.ne_chunk(nltk.pos_tag(nltk.word_tokenize(sentence))):
-		if hasattr(chunk, 'node') and chunk.node == 'PERSON':
-			entities['people'].append(' '.join(c[0] for c in chunk.leaves()))
-	return entities
-=======
-
-def insert(s, i, d):
-	if s[0] not in d:
-		d[s[0]] = ([], {})
-	if len(s) == 1:
-		d[s[0]][0].append(i)
+def npchunk_features(sentence, i, history):
+	word, pos = sentence[i]
+	if i == 0:
+		prevword, prevpos = "<START>", "<START>"
 	else:
-		insert(s[1:], i, d[s[0]][1])
-
-titles = [line.strip().split(' ', 1)
-						for line in open('title_index.txt').readlines()]
-d = {}
-for id, title in titles:
-	insert(title, id, d)
-
-def lookup(s, d):
-	if len(s) == 1:
-		return d[s][0]
-	return lookup(s[1:], d[s[0]][1])
-
-def query(s):
-	results = []
-	for id, title in titles:
-		l = lev.ratio(s, title)
-		results.append((l, id, title))
-	results.sort(key=lambda r: r[0], reverse=True)
-	return results
->>>>>>> 3ada5feead0c00069f7ac41d0d2ec9f4c194e427
-
-def pairs(lst):
-	i = iter(lst)
-	first = prev = i.next()
-	for item in i:
-		yield prev, item
-		prev = item
-	yield item, first
-
-<<<<<<< HEAD
-actors = [line.split(" ", 1) for line in open('actors_index.txt').readlines()]
-for sentence in sentences:
-	matches = {}
-	for person in extract_entities(sentence)['people']:
-		ratios = []
-		for id, actor in actors:
-			s = actor.strip().replace(' ', '').split(',')
-			if len(s) == 1:
-				actor = s[0]
-			else:
-				actor = s[1] + ' ' + s[0]
-			r = lev.jaro(person, actor)
-			if r > 0.9:
-				ratios.append((r, id, actor))
-		ratios.sort(key=lambda x: x[0], reverse=True)
-		if len(ratios) > 0:
-			r, id, actor = ratios[0]
-			matches[person] = { 'id' : id, 'name' : actor, 'class' : 'actor' }
-	for match in matches:
-		print sentence.replace(match, '(' + matches[match]['class'] + ' ' + matches[match]['id'] + ')')
-=======
-
-''' This uses the UnigramChunker.
-I pickled it to make it a little faster. It's slower that the nltk ne_chunker
-but it has better chunking results
-'''
-
-def getEntities(sentence):
+		prevword, prevpos = sentence[i-1]
+	if i == len(sentence)-1:
+		nextword, nextpos = "<END>", "<END>"
+	else:
+		nextword, nextpos = sentence[i+1]
+	return {
+		'pos' : pos,
+		'word' : word,
+		'prevword' : prevword,
+		'prevpos' : prevpos,
+		'nextpos' : nextpos,
+		'nextword' : nextword,
+		'tags-since-dt' : tags_since_dt(sentence, i),
+	}
 	
-	#print sentence
-	
-	try:
-		import cPickle as pickle
-	except:
-		import pickle
-	
-	fh= open('eChunker.pkl','r')
-	chunker = pickle.load(fh)
-	fh.close()
-		
-		
-	patterns = [(r'[A-Z][a-z]+','NNP'),]
-	regexp_tagger= nltk.RegexpTagger(patterns)
-	tagger = nltk.UnigramTagger(nltk.corpus.treebank.tagged_sents(), backoff=regexp_tagger )
-		
-	actors = [line.split(" ", 1) for line in open('actors_index.txt').readlines()]
-		
-	tagged_sent = tagger.tag(nltk.word_tokenize(sentence))
-	tree = chunker.parse(tagged_sent)
-		
-		
-		
-	""" Entities is a list of lists to facilitate pairing
-	 	  with multiple entities in a sentence
-	"""
-	entities=[]
-	for subtree in tree.subtrees():
-		# get NP chunks
-		if subtree.node == 'NP':
-			nplist=[]
-			# check if NP contains any NNP 
-			for child in subtree:
-				name,tag= child
-				if tag == 'NNP': nplist.append(name)
-			
-			if len(nplist) > 0: entities.append(nplist)
-	
-	#print entities
-		
-	matches= {}
-	for list in entities:
-		for pair in pairs(list):
-			first, last= pair
-			name= first + ' ' + last
-			#print name
-			ratios = []
-			for id, actor in actors:
-				s= actor.strip().replace(' ', '').split(',')
-				if len(s) == 1:
-					actor= s[0]
-				else:
-					actor = s[1] + ' ' + s[0]
-				ratio= lev.jaro(name,actor)
-				if ratio >= 0.9:
-					ratios.append((ratio,id,actor))
-			ratios.sort(key=lambda x: x[0], reverse= True)
-			if len(ratios) > 0:
-				r, id, actor = ratios[0]
-				matches[pair] = {'id':id, 'name': actor, 'class': 'actor'}
-	
-	result=[]
-	for match in matches:
-		if matches[match]['class']== 'actor':
-			result.append(('person', matches[match]['id']))
-			
-	return result
+def find_matches(names, people):
+	matches = []
+	for id, person in people:
+		names2 = person.split(',')
+		names2.reverse()
+		r = sum([lev.jaro(n1, n2) for n1, n2 in zip(names, names2)]) / len(zip(names, names2))
+		if r > 0.75:
+			matches.append((r, (id, person)))
+	matches.sort(key=lambda x: x[0], reverse=True)
+	return matches
 
-
-
-
-
-def main():
-	
-	sentences = [
-	"What movies have Bill Murray and Danny DeVito been in together?",
-	"Danny DeVito is funny.",
-	#"I like racing car movies like Gone in 60 Seconds.",
-	"What about something with Nicole Kidman?",
-	"Where is James Cameron?",
-	"I hate Sylvester Stallone",
+def test():
+	import random
+	people = [line.split(" ", 1) for line in open('actors_index.txt').readlines()]
+	people += [line.split(" ", 1) for line in open('actresses_index.txt').readlines()]
+	people = map(lambda (id, name): (id, name.strip()), people)
+	schemas = [
+		"What movies have PERSON and PERSON been in together?",
+		"PERSON is funny.",
+		"What about something with PERSON?",
+		"Who is PERSON?",
+		"I hate PERSON",
+		"Was PERSON in MOVIE",
 	]
-	
-	for sent in sentences:
-		entities=getEntities(sent)
-		for ent in entities:
-			first,last= ent
-			name= first + ' ' + last
-			print sent.replace(name, '(' + entities[ent]['class'] + ' ' + entities[ent]['id'] + ')')
+
+	def is_printable_name(name):
+		for c in name:
+			if ord(c) > 127:
+				return False
+		return True
+
+	def gen_random_sentence(schema):
+		sentence = schema
+		for i in range(sentence.count('PERSON')):
+			name = random.choice(people)[1]
+			while not is_printable_name(name) or len(name.split(',')) == 1:
+				name = random.choice(people)[1]
+			last, first = name.split(',')
+			sentence = sentence.replace('PERSON', first.strip() + ' ' + last.strip(), 1)
+		return sentence
+
+	import cPickle
+	from nltk.corpus import conll2000, brown
+	try:
+		tagger = cPickle.load(open('nerdb_tagger.pkl'))
+	except IOError:
+		train_sents = conll2000.tagged_sents()
+		tagger = nltk.DefaultTagger('NN')
+		tagger = nltk.UnigramTagger(train_sents, backoff=tagger)
+		tagger = nltk.BigramTagger(train_sents, backoff=tagger)
+		tagger = nltk.TrigramTagger(train_sents, backoff=tagger)
+		cPickle.dump(tagger, open('nerdb_tagger.pkl', 'w'))
+	try:
+		chunker = cPickle.load(open('nerdb_chunker.pkl'))
+	except IOError:
+		train_sents = conll2000.chunked_sents()
+		chunker = ConsecutiveNPChunker(tagger, train_sents)
+		cPickle.dump(chunker, open('nerdb_chunker.pkl', 'w'))
+	people = [line.strip().split(" ", 1) for line in open('actors_index.txt').readlines()]
+	people += [line.strip().split(" ", 1) for line in open('actresses_index.txt').readlines()]
+	for schema in schemas:
+		sentence = gen_random_sentence(schema)
+		print sentence
+		tree = chunker.parse(sentence)
+		entities = []
+		for child in tree.subtrees():
+			if child.node == 'NP' and (len(child.leaves()) == 2 or len(child.leaves()) == 3):
+				matches = find_matches(map(lambda x: x[0], child.leaves()), people)
+				if len(matches) > 0:
+					entities.append(matches[0][1])
+		if len(entities) == 0:
+			tree.draw()
+		print entities
 
 if __name__ == '__main__':
-	main()
->>>>>>> 3ada5feead0c00069f7ac41d0d2ec9f4c194e427
+	test()
