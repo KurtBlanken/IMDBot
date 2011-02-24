@@ -10,7 +10,7 @@ class IMDBInterface(object):
 														 user=dbinfo['user'],
 														 passwd=dbinfo['passwd'],
 														 db=dbinfo['db'],
-														 connect_timeout=2)
+														 connect_timeout=3)
 		except:
 			conn = MySQLdb.connect(host=dbinfo['host'],
 														 user=dbinfo['user'],
@@ -23,16 +23,16 @@ class IMDBInterface(object):
 		cur.execute('show tables')
 		table_names = [r[0] for r in cur.fetchall()]
 		tables = {}
-		type_map = {}
+		type_map = {}	
+		self.col_map = {'kind_type':'kind_id','role_type':'role_id'}
 		for table in table_names:
 			cur.execute('desc {0}'.format(table))
 			tables[table] = [r[0] for r in cur.fetchall()]
 			if 'type' in table:
-				col_name = table + '_id'
-				if table == 'kind_type':
-					col_name = 'kind_id'
-				elif table == 'role_type':
-					col_name = 'role_id'
+				if table in self.col_map:
+					col_name = self.col_map[table]
+				else:
+					col_name = table + '_id'
 				type_map[col_name] = (table, {})
 				cur.execute('SELECT * FROM {0}'.format(table))
 				res = cur.fetchall()
@@ -42,28 +42,37 @@ class IMDBInterface(object):
 		self.cur = cur
 		self.tables = tables
 		self.type_map = type_map
+		self.info_type_id = {}
+		for key, value in self.type_map['info_type_id'][1].items():
+			self.info_type_id[value] = key
 
-	def get_movie(self, id):
+	def get_movie(self, id, movie_info=True, info_keys="*", cast_info=True):
 		self.cur.execute('SELECT * FROM title WHERE id={0}'.format(id))
 		res = self.cur.fetchall()
 		assert len(res) == 1
 		res = res[0]
 		d = {}
 		self._add_res_to_dict(self.tables['title'], res, d)
-		self.cur.execute('SELECT * FROM movie_info WHERE movie_id={0}'.format(d['id']))
-		res = self.cur.fetchall()
-		for r in res:
-			d2 = {}
-			self._add_res_to_dict(self.tables['movie_info'], r, d2)
-			if d2['info_type'] not in d:
-				d[d2['info_type']] = []
-			d[d2['info_type']].append(d2['info'])
-		d['cast'] = self.get_cast_info(id)
-		d['actors'] = filter(lambda i: 'role_type' in i and i['role_type'] == 'actor', d['cast'])
-		d['actresses'] = filter(lambda i: 'role_type' in i and i['role_type'] == 'actress', d['cast'])
-		d['writers'] = filter(lambda i: 'role_type' in i and i['role_type'] == 'writer', d['cast'])
-		d['directors'] = filter(lambda i: 'role_type' in i and i['role_type'] == 'director', d['cast'])
-		d['producers'] = filter(lambda i: 'role_type' in i and i['role_type'] == 'producer', d['cast'])
+		if movie_info:
+			query = 'SELECT * FROM movie_info WHERE movie_id={0}'.format(d['id'])
+			if info_keys != "*":
+				info_keys = ', '.join([str(self.info_type_id[key]) for key in info_keys])
+				query += ' AND info_type_id IN ({0})'.format(info_keys)
+			self.cur.execute(query)
+			res = self.cur.fetchall()
+			for r in res:
+				d2 = {}
+				self._add_res_to_dict(self.tables['movie_info'], r, d2)
+				if d2['info_type'] not in d:
+					d[d2['info_type']] = []
+				d[d2['info_type']].append(d2['info'])
+		if cast_info:
+			d['cast'] = self.get_cast_info(id)
+			d['actors'] = filter(lambda i: 'role_type' in i and i['role_type'] == 'actor', d['cast'])
+			d['actresses'] = filter(lambda i: 'role_type' in i and i['role_type'] == 'actress', d['cast'])
+			d['writers'] = filter(lambda i: 'role_type' in i and i['role_type'] == 'writer', d['cast'])
+			d['directors'] = filter(lambda i: 'role_type' in i and i['role_type'] == 'director', d['cast'])
+			d['producers'] = filter(lambda i: 'role_type' in i and i['role_type'] == 'producer', d['cast'])
 		return d
 	
 	def get_cast_info(self, id):
@@ -105,6 +114,10 @@ class IMDBInterface(object):
 					d[d2['role_type']] = set()
 				d[d2['role_type']].add(d2['movie_id'])
 		return d
+		
+	def get_movie_ids(self):
+		self.cur.execute('SELECT id FROM title'.format(id))
+		return map(lambda row: row[0], self.cur.fetchall())
 
 	def _add_res_to_dict(self, col_names, res, d):
 		for k, v in zip(col_names, res):
@@ -114,3 +127,20 @@ class IMDBInterface(object):
 					k = self.type_map[k][0]
 				d[k] = v
 		return d
+
+	def delete_movie(self, id):
+		if self.cur.execute('DELETE FROM title WHERE id={0}'.format(id)) != 0:
+			self.cur.execute('DELETE FROM movie_info WHERE movie_id={0}'.format(id))
+			self.cur.execute('DELETE FROM cast_info WHERE movie_id={0}'.format(id))
+			
+if __name__ == '__main__':
+	imdb = IMDBInterface()
+	deleted = 0
+	ids = imdb.get_movie_ids()
+	for i, id in enumerate(ids):
+		print i / float(len(ids))
+		m = imdb.get_movie(id, info_keys=['genres'], cast_info=False)
+		if 'tv' in m['kind_type'] or 'game' in m['kind_type'] or ('genres' in m and 'Adult' in m['genres']):
+			imdb.delete_movie(m['id'])
+			deleted += 1
+			print deleted

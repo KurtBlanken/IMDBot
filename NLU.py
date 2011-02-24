@@ -9,6 +9,8 @@ contractions = {
 	"'m" : 'am',
 }
 
+nerdb = NERDb.NERDb()
+
 # Remove contractions from word
 # return word
 def uncontract(word):
@@ -39,7 +41,7 @@ def NLU(data):
 	tagged_words = tagger.tag(words)
 	# get any recognized entities
 	#entities = entity_recognition(tagged_words)
-	entities= NERDb.getEntities(data['user_utterance'])
+	entities= nerdb.get_entities(data['user_utterance'])
 	# classify the dialog act
 	act = classify_dialog_act(tagged_words, entities)
 	data['tagged_words'] = tagged_words
