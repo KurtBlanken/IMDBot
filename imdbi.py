@@ -1,5 +1,6 @@
 import MySQLdb
 import os, sys
+from collections import defaultdict
 
 class IMDBInterface(object):
 	def __init__(self):
@@ -51,7 +52,7 @@ class IMDBInterface(object):
 		res = self.cur.fetchall()
 		assert len(res) == 1
 		res = res[0]
-		d = {}
+		d = defaultdict(list)
 		self._add_res_to_dict(self.tables['title'], res, d)
 		if movie_info:
 			query = 'SELECT * FROM movie_info WHERE movie_id={0}'.format(d['id'])
@@ -127,20 +128,11 @@ class IMDBInterface(object):
 					k = self.type_map[k][0]
 				d[k] = v
 		return d
-
-	def delete_movie(self, id):
-		if self.cur.execute('DELETE FROM title WHERE id={0}'.format(id)) != 0:
-			self.cur.execute('DELETE FROM movie_info WHERE movie_id={0}'.format(id))
-			self.cur.execute('DELETE FROM cast_info WHERE movie_id={0}'.format(id))
 			
 if __name__ == '__main__':
 	imdb = IMDBInterface()
-	deleted = 0
 	ids = imdb.get_movie_ids()
 	for i, id in enumerate(ids):
-		print i / float(len(ids))
+		#print i / float(len(ids))
 		m = imdb.get_movie(id, info_keys=['genres'], cast_info=False)
-		if 'tv' in m['kind_type'] or 'game' in m['kind_type'] or ('genres' in m and 'Adult' in m['genres']):
-			imdb.delete_movie(m['id'])
-			deleted += 1
-			print deleted
+		print m['genres']
