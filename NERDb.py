@@ -67,8 +67,8 @@ class NERDb():
     return None
 
   def get_entities(self, sentence):
-    tree = self.chunker.parse(sentence)
     found = set()
+    tree = self.chunker.parse(sentence)
     for child in tree.subtrees():
       if child.node == 'NP':
         match = self.search(' '.join(map(lambda x: x[0], child.leaves())), 0.9)
@@ -112,7 +112,7 @@ def npchunk_features(sentence, i, history):
     'nextword' : nextword,
     'tags-since-dt' : tags_since_dt(sentence, i),
   }
-  
+
 def find_matches(s, type_name, entities, movies, t=0.9):
   matches = []
   for id, entity in entities:
@@ -151,22 +151,60 @@ def test():
 
   def gen_random_sentence(schema):
     sentence = schema
+    inserts = []
     for type_name, entities in entity_types.items():
       for i in range(sentence.count(type_name)):
-        name = random.choice(entities)[1]
-        while not is_printable_name(name) or len(name.split(',')) == 1:
-          name = random.choice(entities)[1]
+        entity = random.choice(entities)
+        while not is_printable_name(entity[1]) or len(entity[1].split(',')) == 1:
+          entity = random.choice(entities)
+        inserts.append(entity)
         if type_name == 'PERSON':
-          last, first = name.split(',')
+          last, first = entity[1].split(',')
           sentence = sentence.replace(type_name, first.strip() + ' ' + last.strip(), 1)
         else:
-          sentence = sentence.replace(type_name, name)
-    return sentence
+          sentence = sentence.replace(type_name, entity[1])
+    return sentence, inserts
   
+  err = 0
+  fperr = 0
+  count = 0
+  samples = 100
+  import time
+  start = time.time()
   for schema in schemas:
-    sentence = gen_random_sentence(schema)
-    print sentence
-    print nerdb.get_entities(sentence)
+    for i in range(samples):
+      sentence, entities = gen_random_sentence(schema)
+      found = nerdb.get_entities(sentence)
+      err += len(entities) - sum([1 for entity in entities if entity in found])
+      if [entity for entity in found if entity not in entities]:
+        fperr += 1
+      count += len(entities)
+  end = time.time()
+  sentences = samples * len(schemas)
+  print 'ned results for {0} schemas, {1} sentences total, {2:.2f} seconds/result'.format(
+    len(schemas), sentences, (end-start)/sentences)
+  print '{0} missed from {1} possible ({2:.0f}%)'.format(err, count, (err/float(count))*100)
+  print '{0} sentences with false positives ({1:.0f}%)'.format(fperr, (fperr/float(sentences))*100)
 
 if __name__ == '__main__':
   test()
+
+'''
+Ablation Study Results:
+  Baseline (everything on):
+    ned results for 7 schemas, 700 sentences total, 0.75 seconds/result
+    6 missed from 900 possible (1%)
+    53 sentences with false positives (8%)
+  Max sub-token length len(tokens)/2:
+    ned results for 7 schemas, 700 sentences total, 0.48 seconds/result
+    39 missed from 900 possible (4%)
+    55 sentences with false positives (8%)
+  Chunk matching only:
+    ned results for 7 schemas, 700 sentences total, 0.05 seconds/result
+    327 missed from 900 possible (36%)
+    51 sentences with false positives (7%)
+  Sub-tokens only:
+    ned results for 7 schemas, 700 sentences total, 0.72 seconds/result
+    101 missed from 900 possible (11%)
+    21 sentences with false positives (3%)
+'''
