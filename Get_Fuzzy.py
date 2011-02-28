@@ -4,21 +4,28 @@ import imdb
 
 # numbers that can increase difference
 RATING_WEIGHT = 2.0
-VOTE_DIST_WEIGHT = 10.0
+VOTE_DIST_WEIGHT = 2.0
 MPAA_R_WEIGHT = 3.0
 
 # numbers that decrease difference (must be < 1)
-MPAA_WEIGHT = .3
-GENRE_WEIGHT = .6
+MPAA_WEIGHT = .25
+GENRE_WEIGHT = .5
 ACTOR_WEIGHT = .02 # increase based on preferences or whatever
-WRITER_WEIGHT = .5
-DIRECTOR_WEIGHT = .6
+WRITER_WEIGHT = .45
+DIRECTOR_WEIGHT = .45
 
 ratings = {'G': 0, 'PG': 1, 'PG-13': 2, 'R': 3, 'NC-17': 10, 'UR': 11}
+required_keys = ('votes distribution','rating','genres','mpaa','cast','writer','director')
 
 def get_closeness(imdb, movie1, movie2):
-   imdb.update(movie1, 'all')
-   imdb.update(movie2, 'all')
+   # Should already be updated
+   #imdb.update(movie1, 'all')
+   #imdb.update(movie2, 'all')
+
+   # needs correct keys
+   for key in required_keys:
+      if key not in movie1.keys() or key not in movie2.keys():
+         return 100
    # the difference value, 0 = most similar
    diff = 50
    i = 0
@@ -26,7 +33,15 @@ def get_closeness(imdb, movie1, movie2):
    while i < 10:
       ratingA = movie1['votes distribution'][i]
       ratingB = movie2['votes distribution'][i]
-      diff += abs(float(ratingA) - float(ratingB)) * VOTE_DIST_WEIGHT
+      try:
+         ratingA = float(ratingA)
+      except ValueError:
+         ratingA = 0.0
+      try:
+         ratingB = float(ratingA)
+      except ValueError:
+         ratingB = 0.0
+      diff += abs(ratingA - ratingB) * VOTE_DIST_WEIGHT
       i += 1
    diff += abs(movie1['rating'] - movie2['rating']) * RATING_WEIGHT
    
@@ -40,7 +55,7 @@ def get_closeness(imdb, movie1, movie2):
    
    # mpaa
    mpaa1 = movie1['mpaa'].split()
-   mpaa2 = movie2['mpaa'].split()l
+   mpaa2 = movie2['mpaa'].split()
    mpaa1.pop(0)
    mpaa2.pop(0)
    mpaa1.pop(1)
