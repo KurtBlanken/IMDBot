@@ -3,19 +3,19 @@ cases = [
 # utterance
 'When was Armageddon made?',
 # NLU output / dialog manager input
-{  'act' : 'trivia',
-  'trivias' : [
-    {  'attr' : 'when',
-      'entity' : ('movie', 48368),
-    }]
+{ 'act' : 'trivia',
+  'trivia' : {
+    'attr' : 'when',
+  },
+  'entities' : [('movie', 48368)],
 },
 # dialog manager output / NLG input
-{  'act' : 'trivia',
-  'trivias' : [
-    {  'attr' : 'when',
-      'entity' : ('movie', 48368),
-      'answer' : 1998,
-    }]
+{ 'act' : 'trivia',
+  'trivia' : {
+    'attr' : 'when',
+     'answer' : 1998,
+  },
+  'entities' : [('movie', 48368)],
 },
 [
   '1998.',
@@ -27,19 +27,19 @@ cases = [
 # utterance
 'Was Matt Damon in Armageddon?',
 # NLU output / dialog manager input
-{  'act' : 'trivia',
-  'trivias' : [
-    {  'attr' : 'in',
-      'entities' : [('person', 260886), ('movie', 48368)],
-    }]
+{ 'act' : 'trivia',
+  'trivia' : {
+    'attr' : 'in',
+  },
+  'entities' : [('person', 260886), ('movie', 48368)],
 },
 # dialog manager output / NLG input
-{  'act' : 'trivia',
-  'trivias' : [
-    {  'attr' : 'in',
-      'entities' : [('person', 260886), ('movie', 48368)],
-      'answer' : False,
-    }]
+{ 'act' : 'trivia',
+  'trivia' : {
+    'attr' : 'in',
+    'answer' : False,
+  },
+  'entities' : [('person', 260886), ('movie', 48368)],
 },
 [
   'No.',
@@ -51,19 +51,19 @@ cases = [
 # utterance
 'Was Ben Affleck in Armageddon?',
 # NLU output / dialog manager input
-{  'act' : 'trivia',
-  'trivias' : [
-    {  'attr' : 'in',
-      'entities' : [('person', 8590), ('movie', 48368)],
-    }]
+{ 'act' : 'trivia',
+  'trivia' : {
+    'attr' : 'in',
+  },
+  'entities' : [('person', 8590), ('movie', 48368)],
 },
 # dialog manager output / NLG input
-{  'act' : 'trivia',
-  'trivias' : [
-    {  'attr' : 'in',
-      'entities' : [('person', 260886), ('movie', 48368)],
-      'answer' : False,
-    }]
+{ 'act' : 'trivia',
+  'trivia' : {
+    'attr' : 'in',
+    'answer' : False,
+  },
+  'entities' : [('person', 260886), ('movie', 48368)],
 },
 [
   'No.',
@@ -75,12 +75,12 @@ cases = [
 # utterance
 'I think Danny Devito is hilarious',
 # NLU output / dialog manager input
-{  'act' : 'pref',
+{ 'act' : 'pref',
   'pos' : set([('actor', 291778)]),
   'neg' : set(),
 },
 # dialog manager output / NLG input
-{  'act' : 'pref',
+{ 'act' : 'pref',
   'pos' : set([('actor', 291778)]),
   'neg' : set(),
   'prefs' : { ('actor', 291778) : 'hilarious' }
@@ -146,22 +146,25 @@ for utterance, nlu_dm, dm_nlg, outputs in d['cases']:
   }
   try:
     NLU.NLU(data)
-  except:
+  except Exception as err:
     print 'NLU failed on', utterance
+    print err
   else:
     print 'NLU:'
     print data
   try:
     DM.DM(nlu_dm)
-  except:
+  except Exception as err:
     print 'DM failed on', utterance
+    print err
   else:
     print 'DM'
     print nlu_dm
   try:
     NLG.NLG(dm_nlg)
-  except:
+  except Exception as err:
     print 'NLG failed on', utterance
+    print err
   else:
     print 'NLG'
     print dm_nlg

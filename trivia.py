@@ -1,4 +1,7 @@
 '''
+  supported attrs:
+    in, plot, when, role, director, producer
+    
   trivia handler, updates the data structer with answers to
   trivia questions. takes in nlu_to_dm_test_input and then append an answer
   field to the trivias dictionary.
