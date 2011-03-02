@@ -35,7 +35,7 @@ def NLU(data):
 	# uncontract and tokenize utterance
 	words = [uncontract(word) for word in nltk.word_tokenize(data['user_utterance'])]
 	# tag words with saved tagger
-	tagged_words = tagger.tag(words)
+	tagged_words = nltk.pos_tag(words)
 	# get any recognized entities
 	entities = entity_recognition(tagged_words)
 	# classify the dialog act
