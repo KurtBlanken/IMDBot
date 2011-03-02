@@ -1,0 +1,6 @@
+Was person in movie?, in
+What's the plot of movie?, plot
+When was movie made?, when
+What role did person play in movie?, role
+Who directed movie?, director
+Who produced movie?, producer

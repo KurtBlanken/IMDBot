@@ -116,15 +116,14 @@ def npchunk_features(sentence, i, history):
 def find_matches(s, type_name, entities, movies, t=0.9):
   matches = []
   for id, entity in entities:
-    orig = entity
     if type_name == 'PERSON':
       entity = entity.split(',')
       entity.reverse()
       entity = ' '.join(entity)
-    r = lev.ratio(s, entity)
+    r = lev.ratio(s.lower(), entity.lower())
     if r > t:
-      matches.append((r, (id, orig)))
-  matches.sort(key=lambda x: x[0], reverse=True)
+      matches.append((r, (type_name.lower(), id, s)))
+  matches.sort(key=lambda x: x[1], reverse=True)
   return matches
 
 def test():

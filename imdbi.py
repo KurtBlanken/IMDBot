@@ -131,8 +131,14 @@ class IMDBInterface(object):
 			
 if __name__ == '__main__':
 	imdb = IMDBInterface()
-	ids = imdb.get_movie_ids()
-	for i, id in enumerate(ids):
+	ids = [line.split()[0] for line in open("title_index.txt").readlines()]
+	store = {}
+	for id in ids:
+	  store[id] = imdb.get_movie(id)
+	import cPickle
+	cPickle.dump(store, "title_db.txt")
+	#ids = imdb.get_movie_ids()
+	#for i, id in enumerate(ids):
 		#print i / float(len(ids))
-		m = imdb.get_movie(id, info_keys=['genres'], cast_info=False)
-		print m['genres']
+		#m = imdb.get_movie(id, info_keys=['genres'], cast_info=False)
+		#print m['genres']
