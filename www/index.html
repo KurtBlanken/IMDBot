@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+  <title>IMDBot</title>
+	<script src="/js/jquery-1.4.4.min.js"></script>
+	<script src="/js/jquery-ui-1.8.9.custom.min.js"></script>
+	<script src="/js/sprintf.js"></script>
+</head>
+<style type="text/css">
+	* {
+		margin: 0px;
+		padding: 0px;
+	}
+	#chat {
+		margin-left: 20px;
+	}
+	#responses {
+		height: 200px;
+		width: 500px;
+		border: 1px solid black;
+		margin-top: 20px;
+		overflow: auto;
+		padding-top: 5px;
+	}
+	#responses p {
+		padding-left: 5px;
+	}
+	#prefs {
+		border: 1px solid black;
+		border-radius: 15px;
+		float: left;
+		margin-top: 10px;
+		margin-left: 20px;
+		min-width: 300px;
+		min-height: 2em;
+	}
+	#prefs h1 {
+		font-size: 1em;
+		padding-top: 5px;
+		padding-left: 15px;
+	}
+	#prefs p {
+		padding-left: 25px;
+	}
+	input {
+		width: 498px;
+	}
+</style>
+<body> 
+<script>
+$(document).ready(function(){
+	socket = new WebSocket("ws://" + window.location.hostname + ":8081/ws");  
+	socket.onmessage = function(msg){
+		msg = JSON.parse(msg.data);
+		response = JSON.parse(msg["response"]);
+		$("#responses").append("<p>" + response["id"] + ": " + response["user_utterance"] + "</p>");
+		$("#responses").append("<p>IMDBot: " + response['output'] + "</p>");
+		$("#responses").scrollTop(1000000000);
+		$("#prefs").children("p").remove();
+		prefs = response["prefs"];
+		for (p in prefs) {
+			$("#prefs").children("h1").after("<p>" + prefs[p][1] + "</p>");
+		}
+	};
+	$("input").keydown(function(event) {
+		if (event.keyCode == 13) {
+			msg = $("input").attr("value");
+			$("input").attr("value", "");
+			socket.send(JSON.stringify({id : "James", msg : msg}) + "\n");
+		}
+	});
+});
+</script>
+
+<div id="chat">
+	<div id="responses">
+	</div>
+	<input type="text"></input>
+</div>
+<div style="clear:both"></div>
+<div id="prefs">
+	<h1>Preferences</h1>
+</div>
+
+</body>
+</html>
