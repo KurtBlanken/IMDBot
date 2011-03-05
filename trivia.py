@@ -1,3 +1,7 @@
+import imdbi
+
+interface= imdbi.IMDBInterface()
+
 '''
   supported attrs:
     in, plot, when, role, director, producer
@@ -13,8 +17,16 @@ def handle(data):
 			triv_type = triv['attr']
 			#'in' questions answers true/false
 			if triv_type == 'in':
-				type1, p_id = triv['entities'][0]
-				type2, m_id = triv['entities'][1]
+				type1= ''
+				type2= ''
+				p_id= ''
+				m_id= ''
+				if len(triv['entities']) == 2:
+					for entity in triv['entities']:
+						if entity[0]== "person":
+							type1, p_id= entity
+						else:
+							type2, m_id= entity
 				if type1 == 'person' and type2 == 'movie':
 					is_person_in_movie(data, p_id, m_id)
 				else:
@@ -33,7 +45,7 @@ def handle(data):
 #helper function to find if an actor/actress was in a movie
 def is_person_in_movie(data, p_id, m_id):
 	data['answer'] = False
-	movie = data['imdbi'].get_movie(m_id)
+	movie = interface.get_movie(m_id)
 	if 'actors' in movie:
 		for actor in movie['actors']:
 			if actor['person_id'] == p_id:
