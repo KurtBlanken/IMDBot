@@ -2,6 +2,7 @@ import nltk
 from nltk.corpus import conll2000, brown
 import Levenshtein as lev
 import cPickle
+import re
 
 class ConsecutiveNPChunker(nltk.ChunkParserI):
   def __init__(self, tagger, chunked_sents):
@@ -22,7 +23,10 @@ class ConsecutiveNPChunker(nltk.ChunkParserI):
     self.tagger = tagger
     
   def parse(self, sentence):
-    tagged_sent = self.tagger.tag(nltk.word_tokenize(sentence))
+    #tagged_sent = self.tagger.tag(nltk.word_tokenize(sentence))
+    #tagged_sent = nltk.pos_tag(nltk.word_tokenize(sentence))
+    tagged_sent= nltk.pos_tag(re.split(r'[ \n!#$%&\*^()/]+',sentence))
+    #tagged_sent= nltk.pos_tag(nltk.word_tokenize(sentence.replace("'", '').replace(',', '')))
     history = []
     for i, word in enumerate(tagged_sent):
       featureset = npchunk_features(tagged_sent, i, history)
@@ -69,12 +73,15 @@ class NERDb():
   def get_entities(self, sentence):
     found = set()
     tree = self.chunker.parse(sentence)
+    #print tree
     for child in tree.subtrees():
       if child.node == 'NP':
         match = self.search(' '.join(map(lambda x: x[0], child.leaves())), 0.9)
         if match:
           found.add(match)
-    tokens = nltk.word_tokenize(sentence.replace("'", '').replace(',', ''))
+    #tokens = nltk.word_tokenize(sentence.replace("'", '').replace(',', ''))
+    tokens = re.split(r'[ \n!#$%&\*^()/]+',sentence)
+    #print tokens
     for i in range(len(tokens)):
       for j in range(1,len(tokens)):
         if i+j+1 < len(tokens):
@@ -118,11 +125,14 @@ def find_matches(s, type_name, entities, movies, t=0.9):
   for id, entity in entities:
     if type_name == 'PERSON':
       entity = entity.split(',')
+      # strip whitespace from entity elements
+      for (i, el) in enumerate(entity):
+      	entity[i]= el.strip()
       entity.reverse()
       entity = ' '.join(entity)
     r = lev.ratio(s.lower(), entity.lower())
     if r > t:
-      matches.append((r, (type_name.lower(), id, s)))
+      matches.append((r, (type_name.lower(), long(id), entity))) # db returns ids as longs
   matches.sort(key=lambda x: x[1], reverse=True)
   return matches
 
