@@ -4,3 +4,18 @@ When was movie made?, when
 What role did person play in movie?, role
 Who directed movie?, director
 Who produced movie?, producer
+Did person produce movie?, producer
+Did person direct movie?, director
+Movie was directed by person?, director
+Did person play in movie?, in
+Who did person play in movie?, role
+Who was that character person played in movie? role
+Movie had person right?, in
+Movie had person?, in
+That movie had person?, in
+What movie had person?, in
+When was movie screened?, when
+When was person born?, when
+When did movie come out?, when
+How many films has person been in?, acted
+How many films did person direct?, directed
