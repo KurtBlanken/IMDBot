@@ -98,7 +98,7 @@ def NLU(data):
   	print schema
   	if schema in data['schema']:
   		data['act'] = 'trivia'
-  		data['trivia'] = [{}]
-  		data['trivia'][0]['attr'] = attr
-  		data['trivia'][0]['entities'] = data['entities']
+  		data['trivia'] = {}
+  		data['trivia']['attr'] = attr
+  		data['trivia']['entities'] = data['entities']
       
