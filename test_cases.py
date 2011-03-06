@@ -142,8 +142,7 @@ for utterance, nlu_dm, dm_nlg, outputs in d['cases']:
     'imdbi' : imdbi,
   }
   
-  nlg_pos = 0
-  nlg_neg = 0
+
   try:
     NLU.NLU(data)
   except Exception as err:
@@ -167,12 +166,8 @@ for utterance, nlu_dm, dm_nlg, outputs in d['cases']:
     print err
     nlg_neg = nlg_neg + 1
   else:
-    for out in outputs 
-      if dm_nlg['output'] == out:	  
-        nlg_pos = nlg_pos + 1
-      else:
-        nlg_neg = nlg_neg + 1
-    print 'NLG'
-    print 'NLG errors = ' + str(nlg_neg)
-    print 'NlG corect = ' + str(nlg_pos)
+    if True in [dm_nlg['output'] == out for out in outputs]:
+		nlg_correct += 1
+	nlg_count += 1
+print 'NLG: {0} / {1} ({2:.0f}%)'.format(nlg_incorrect, nlg_correct, float(nlg_correct)/nlg_count * 100)
 
