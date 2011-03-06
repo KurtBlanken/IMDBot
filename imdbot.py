@@ -3,6 +3,7 @@ import os, sys
 from threading import Thread
 import subprocess
 import json
+import imdbi
 import NLU, DM, NLG
 
 server = False
@@ -25,6 +26,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'server':
   _, w = os.pipe()
   sys.stdout = os.fdopen(w, 'w')
 
+imdb = imdbi.IMDBInterface()
 if not server:
   import readline
   try:
@@ -50,18 +52,22 @@ while 1:
     'user_utterance' : user_utterance,
     'prefs' : set(),
     'errors' : [],
+    'imdbi' : imdb,
   }
   NLU.NLU(data)
-  DM.DM(data)
-  NLG.NLG(data)
+  #DM.DM(data)
+  #NLG.NLG(data)
   for key, value in data.items():
     if type(value) == type(set()):
       data[key] = list(value)
-  result = json.dumps(data)
+  #print data
+  #result = json.dumps(data)
+  result =''
   if server:
     sys.stderr.write('> ' + user_utterance + '\n')
     sys.stderr.write('< ' + result + '\n')
-  sys.stdout.write(result + '\n')
+  print data['output']
+  '''sys.stdout.write(result + '\n')
   sys.stdout.flush()
-  
+  '''
 os.remove('/tmp/imdbot_pid')

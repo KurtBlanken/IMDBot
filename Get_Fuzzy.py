@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import string
-import imdb
+import imdbi
 
 # numbers that can increase difference
 RATING_WEIGHT = 2.0
@@ -69,7 +69,6 @@ def get_closeness(imdb, movie1, movie2):
       if reason != 'and' and reason != 'some':
          if reason in mpaa2:
             diff -= (diff * MPAA_WEIGHT)
-            
    # actors are not in any particular order
    for actor in movie1['cast']:
       if actor in movie2['cast']:
@@ -84,13 +83,4 @@ def get_closeness(imdb, movie1, movie2):
          diff -= (diff * DIRECTOR_WEIGHT)
    # studio?
    # characters?
-   
-
    return diff;
-   
-# in my current database, first result is not necessarily a movie
-def get_movie(movie):
-   for m in movie:
-      if m['kind'] == 'movie':
-         return m
-   return 'void movie'

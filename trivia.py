@@ -1,20 +1,62 @@
+
+import re
+
 '''
   supported attrs:
     in, plot, when, role, director, producer
     
   trivia handler, updates the data structer with answers to
   trivia questions. takes in nlu_to_dm_test_input and then append an answer
-  field to the trivias dictionary.
+  field to the trivia dictionary.
 '''
 import random
 
 def handle(data):
+	'''
+	for triv in data['trivia']:
+		triv['answer'] = list()
+		if triv['attr'] != '':
+			triv_type = triv['attr']
+			#'in' questions answers true/false
+			if triv_type == 'in':
+				type1= ''
+				type2= ''
+				p_id= ''
+				m_id= ''
+				if len(triv['entities']) == 2:
+					for entity in triv['entities']:
+						if entity[0]== "person":
+							type1, p_id= entity
+						else:
+							type2, m_id= entity
+				if type1 == 'person' and type2 == 'movie':
+					is_person_in_movie(data, p_id, m_id)
+				else:
+					triv['answer'] = 'How can a {0} be in a {1}'.format(type1, type2)
+      #'when' function asking for production year
+			elif triv_type == 'when':
+				type, id = triv['entity']
+				if type == 'movie':
+					mov = data['data['imdbi']'].get_movie(id)
+					triv['answer'] = mov['production_year']
+				else:
+					triv['answer'] = "I don't know about {0}s".format(type)
+=======
+'''
 	triv = data['trivia']
 	if triv['attr'] != '':
 		triv_type = triv['attr']
 		if triv_type == 'role':
-			type1, p_id = data['entities'][0]
-			type2, m_id = data['entities'][1]
+			type1= ''
+			type2= ''
+			p_id= ''
+			m_id= ''
+			if len(triv['entities']) == 2:
+				for entity in triv['entities']:
+					if entity[0]== "person":
+						type1, p_id= entity
+					else:
+						type2, m_id= entity
 			if type1 == 'person' and type2 == 'movie':
 				movie = data['imdbi'].get_movie(m_id)
 				triv['answer'] = "Sorry, couldn't find the character."
@@ -27,26 +69,23 @@ def handle(data):
 							triv['answer'].append(name[0][0])
 						if 'note' in cast:
 								triv['answer'].append(cast['note'])
-		if triv_type == 'producer':
-			triv_movies(data, 'producers')
-		if triv_type == 'director':
-			triv_movies(data, 'directors')
-		if triv_type == 'plot':
+		elif triv_type == 'producer':
+			who_movie(data, triv_type)
+		elif triv_type == 'director':
+			who_movie(data, triv_type)
+		elif triv_type == 'plot':
 			type, m_id = data['entities'][0]
 			if type == 'movie':
 				movie = data['imdbi'].get_movie(m_id)
-			if len(mov['plot']) != 0:
-				triv['answer'] = random.sample(mov['plot'], 1)
+			if len(movie['plot']) != 0:
+				triv['answer'] = random.sample(movie['plot'], 1)
 			else:
 				triv['answer'] = "Ask the plot of a movie please."
 		#'in' questions answers true/false
-		if triv_type == 'in':
+		elif triv_type == 'in':
 			type1, p_id = data['entities'][0]
 			type2, m_id = data['entities'][1]
-			if type1 == 'person' and type2 == 'movie':
-				triv_movies(data, 'actors')
-			else:
-				triv['answer'] = 'How can a {0} be {1}'.format(type1, type2)
+			triv_movies(data,'actors')
 #'when' function asking for production year
 		elif triv_type == 'when':
 			type, id = triv['entities'][0]
@@ -79,11 +118,19 @@ def triv_movies(data, role):
 			if role == 'actors':
 				for ppl in movie['actresses']:
 					triv['answer'].append(ppl['name'])
+
 		else:
 			triv['answer'] = "don't know"
 	elif len(data['entities']) == 2:
-		type1, p_id = data['entities'][0]
-		type2, m_id = data['entities'][1]
+		type1= ''
+		type2= ''
+		p_id= ''
+		m_id= ''
+		for entity in triv['entities']:
+			if entity[0]== "person":
+				type1, p_id= entity
+			else:
+				type2, m_id= entity
 		is_person_in_movie(data, p_id, m_id, role)
 	elif len(data['entities']) > 2:
 		p_id = 0
@@ -101,6 +148,13 @@ def triv_movies(data, role):
 		triv['answer'] = final_ans		
 
 
+'''<<<<<<< HEAD
+#helper function to find if an actor/actress was in a movie
+def is_person_in_movie(data, p_id, m_id):
+	data['answer'] = False
+	movie = interface.get_movie(m_id)
+	if 'actors' in movie:
+======='''
 #helper function to find if an actor/actress was in a movie.
 #if a producer produced a movie.
 #if a director directed a movie.
@@ -123,3 +177,38 @@ def is_person_in_movie(data, p_id, m_id, role_type):
 		for producer in movie['producers']:
 			if producer['person_id'] == p_id:
 				data['trivia']['answer'] = True
+				
+
+# helper function to determine who produced/directed a movie
+def who_movie(data, triv_type):
+	m_id= None
+	answers= []
+	if len(data['entities']) == 1:
+		#entities is a list of tuples
+		m_id= data['entities'][0][1]
+	#print m_id
+	data['trivia']['answer'] = "I don't know."
+	movie = data['imdbi'].get_movie(m_id)
+	if triv_type == 'director':
+		if 'directors' in movie:
+			# directors is a list of dictionaries
+			directors= []
+			for director in movie['directors']:
+				answers.append(director['name'])
+			
+			#data['trivia']['answer'] = directors
+	elif triv_type == 'producer':
+		if 'producers' in movie:
+			producers= []
+			for producer in movie['producers']:
+				answers.append(producer['name'])
+			#data['trivia']['answer'] = producers
+	# output answers in first last format
+	if len(answers) > 0:
+		tmp = []
+		for answer in answers:
+			answer= re.split(r'[,\s]+', answer)
+			answer.reverse()
+			answer= ' '.join(answer)
+			tmp.append(answer)
+		data['trivia']['answer']= tmp
