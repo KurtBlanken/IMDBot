@@ -119,6 +119,14 @@ class IMDBInterface(object):
 	def get_movie_ids(self):
 		self.cur.execute('SELECT id FROM title'.format(id))
 		return map(lambda row: row[0], self.cur.fetchall())
+	
+	def add_rating(self, m, rating):
+		self.cur.execute("SELECT count(*) FROM movie_info WHERE movie_id={0} AND info_type_id={1}".format(m['id'], 197))
+		res = self.cur.fetchall()
+		if res[0][0] == 0:
+			self.cur.execute("INSERT INTO movie_info (movie_id, info_type_id, info) VALUES ({0}, {1}, '{2}')".format(m['id'], 197, rating[0]))
+			self.cur.execute("INSERT INTO movie_info (movie_id, info_type_id, info) VALUES ({0}, {1}, '{2}')".format(m['id'], 199, rating[1]))
+			self.cur.execute("INSERT INTO movie_info (movie_id, info_type_id, info) VALUES ({0}, {1}, '{2}')".format(m['id'], 201, rating[2]))
 
 	def _add_res_to_dict(self, col_names, res, d):
 		for k, v in zip(col_names, res):
@@ -132,13 +140,22 @@ class IMDBInterface(object):
 if __name__ == '__main__':
 	imdb = IMDBInterface()
 	ids = [line.split()[0] for line in open("title_index.txt").readlines()]
-	store = {}
+	ratings = open('ratings.list').readlines()
+	for i, line in enumerate(ratings):
+		line = line.strip()
+		line = line.split()
+		ratings[i] = [line[0], line[1], line[2], ' '.join(line[3:])]
+	started = False
 	for id in ids:
-	  store[id] = imdb.get_movie(id)
-	import cPickle
-	cPickle.dump(store, "title_db.txt")
-	#ids = imdb.get_movie_ids()
-	#for i, id in enumerate(ids):
-		#print i / float(len(ids))
-		#m = imdb.get_movie(id, info_keys=['genres'], cast_info=False)
-		#print m['genres']
+		if int(id) == 421104:
+			started = True
+		if not started:
+			continue			
+		print id
+		m = imdb.get_movie(id)
+		matches = []
+		for rating in ratings:
+			if m['title'] in rating[3]:
+				matches.append(rating)
+		if len(matches) == 1:
+			imdb.add_rating(m, matches[0])
