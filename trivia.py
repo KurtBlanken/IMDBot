@@ -1,6 +1,5 @@
 
-
-
+import re
 
 '''
   supported attrs:
@@ -8,7 +7,7 @@
     
   trivia handler, updates the data structer with answers to
   trivia questions. takes in nlu_to_dm_test_input and then append an answer
-  field to the trivias dictionary.
+  field to the trivia dictionary.
 '''
 import random
 
@@ -70,11 +69,11 @@ def handle(data):
 							triv['answer'].append(name[0][0])
 						if 'note' in cast:
 								triv['answer'].append(cast['note'])
-		if triv_type == 'producer':
-			triv_movies(data, 'producers')
-		if triv_type == 'director':
-			triv_movies(data, 'directors')
-		if triv_type == 'plot':
+		elif triv_type == 'producer':
+			who_movie(data, triv_type)
+		elif triv_type == 'director':
+			who_movie(data, triv_type)
+		elif triv_type == 'plot':
 			type, m_id = data['entities'][0]
 			if type == 'movie':
 				movie = data['imdbi'].get_movie(m_id)
@@ -83,7 +82,7 @@ def handle(data):
 			else:
 				triv['answer'] = "Ask the plot of a movie please."
 		#'in' questions answers true/false
-		if triv_type == 'in':
+		elif triv_type == 'in':
 			type1, p_id = data['entities'][0]
 			type2, m_id = data['entities'][1]
 			triv_movies(data,'actors')
@@ -178,3 +177,38 @@ def is_person_in_movie(data, p_id, m_id, role_type):
 		for producer in movie['producers']:
 			if producer['person_id'] == p_id:
 				data['trivia']['answer'] = True
+				
+
+# helper function to determine who produced/directed a movie
+def who_movie(data, triv_type):
+	m_id= None
+	answers= []
+	if len(data['entities']) == 1:
+		#entities is a list of tuples
+		m_id= data['entities'][0][1]
+	#print m_id
+	data['trivia']['answer'] = "I don't know."
+	movie = data['imdbi'].get_movie(m_id)
+	if triv_type == 'director':
+		if 'directors' in movie:
+			# directors is a list of dictionaries
+			directors= []
+			for director in movie['directors']:
+				answers.append(director['name'])
+			
+			#data['trivia']['answer'] = directors
+	elif triv_type == 'producer':
+		if 'producers' in movie:
+			producers= []
+			for producer in movie['producers']:
+				answers.append(producer['name'])
+			#data['trivia']['answer'] = producers
+	# output answers in first last format
+	if len(answers) > 0:
+		tmp = []
+		for answer in answers:
+			answer= re.split(r'[,\s]+', answer)
+			answer.reverse()
+			answer= ' '.join(answer)
+			tmp.append(answer)
+		data['trivia']['answer']= tmp

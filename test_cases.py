@@ -43,7 +43,7 @@ cases = [
 },
 [
   'No.',
-
+  "I don't think so.",
 
 ]
 ),
@@ -63,7 +63,6 @@ cases = [
   'trivia' : {
     'attr' : 'in',
     'answer' : True,
-
   },
   'entities' : [('person', 260886), ('movie', 48368)],
 },
@@ -97,7 +96,6 @@ cases = [
 # utterance
 'I think Fubie Fubar is hilarious',
 # NLU output / dialog manager input
-
 { 'act' : 'pref',
   'pos' : set(),
   'neg' : set(),
@@ -111,7 +109,6 @@ cases = [
 },
 [
   'Huh?',
-
 ]
 ),
 ] # end cases
@@ -129,6 +126,8 @@ for i, line in enumerate(lines):
 lines = filter(line.strip, lines[:end])
 d = {}
 exec ''.join(lines) in d
+nlg_correct = 0
+nlg_count = 0
 for utterance, nlu_dm, dm_nlg, outputs in d['cases']:
   nlu_dm['imdbi'] = imdbi
   nlu_dm['id'] = 'test'
@@ -169,10 +168,10 @@ for utterance, nlu_dm, dm_nlg, outputs in d['cases']:
   except Exception as err:
     print 'NLG failed on', utterance
     print err
-    nlg_neg = nlg_neg + 1
   else:
-    if True in [dm_nlg['output'] == out for out in outputs]:
-		nlg_correct += 1
-	nlg_count += 1
-print 'NLG: {0} / {1} ({2:.0f}%)'.format(nlg_incorrect, nlg_correct, float(nlg_correct)/nlg_count * 100)
-
+    if dm_nlg['output'] in outputs:
+      nlg_correct += 1
+    else:
+    	print type(dm_nlg['output'])
+    nlg_count += 1
+print 'NLG: {0} / {1} ({2:.0f}%)'.format(nlg_correct, nlg_count, float(nlg_correct)/nlg_count * 100)

@@ -1,5 +1,5 @@
 import nltk
-import NERDb
+import NERDb, DM
 from Ontology import *
 
 contractions = {
@@ -29,20 +29,15 @@ def uncontract(word):
   
 def NLU(data):
   # uncontract and tokenize utterance
+  '''
+  Input: {'errors': [], 'prefs': set([]), 'imdbi': <imdbi.IMDBInterface object at 0x10a334350>, 'id': 'console', 'user_utterance': 'Who directed Armageddon?'}
+  '''
   words = [uncontract(word) for word in nltk.word_tokenize(data['user_utterance'])]
   # tag words with saved tagger
   tagged_words = nltk.pos_tag(nltk.word_tokenize(data['user_utterance']))
   entitites= set()
-  
-  
-  words = nltk.word_tokenize(data['user_utterance'])
-  
   sentence= data['user_utterance']
-  for word in words:
-  	if word.isdigit():
-  		if word in numbers:
-  			sentence= sentence.replace(word, numbers[word].title())
-  			
+  
   #print sentence
   # get any recognized entities
   entities = nerdb.get_entities(sentence)
@@ -50,7 +45,7 @@ def NLU(data):
   data['tagged_words'] = tagged_words
   data['entities'] = map(lambda (type_name, id, s): (type_name, id), entities)
   #print entities
-  print data['entities']
+  #print data['entities']
   
   # add entity to pos and neg preference set
   data['pos'] = set()
@@ -93,12 +88,15 @@ def NLU(data):
   for (type_name, entity, s) in entities:
     schema = schema.replace(s, type_name)
   data['schema'] = schema
-  print schema
   for schema, attr in trivias:
-  	print schema
   	if schema in data['schema']:
   		data['act'] = 'trivia'
   		data['trivia'] = {}
   		data['trivia']['attr'] = attr
   		data['trivia']['entities'] = data['entities']
+  		
+  
+  # pass data into DM
+  #print data
+  DM.DM(data)
       
