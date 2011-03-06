@@ -14,8 +14,8 @@ nerdb = NERDb.NERDb()
 porter= nltk.PorterStemmer()
 
 prefs = [line.strip() for line in open('preferences.txt').readlines() if len(line.strip()) > 0]
-pos = prefs[prefs.index("# pos")+1:prefs.index("# neg")]
-neg = prefs[prefs.index("# neg")+1:]
+pos = set(prefs[prefs.index("# pos")+1:prefs.index("# neg")])
+neg = set(prefs[prefs.index("# neg")+1:])
 trivias = [line.strip().split(', ') for line in open('trivia_types.txt').readlines()]
 numbers = eval(open('numbers.txt').read())
 
@@ -46,11 +46,11 @@ def NLU(data):
   #print sentence
   # get any recognized entities
   entities = nerdb.get_entities(sentence)
-  print entities
+  #print entities
   data['tagged_words'] = tagged_words
   data['entities'] = map(lambda (type_name, id, s): (type_name, id), entities)
   #print entities
-  #print data['entities']
+  print data['entities']
   
   # add entity to pos and neg preference set
   data['pos'] = set()
@@ -93,10 +93,12 @@ def NLU(data):
   for (type_name, entity, s) in entities:
     schema = schema.replace(s, type_name)
   data['schema'] = schema
+  print schema
   for schema, attr in trivias:
-    if schema in data['schema']:
-      data['act'] = 'trivia'
-      data['trivias'] = [{}]
-      data['trivias'][0]['attr'] = attr
-      data['trivias'][0]['entities'] = data['entities']
+  	print schema
+  	if schema in data['schema']:
+  		data['act'] = 'trivia'
+  		data['trivias'] = [{}]
+  		data['trivias'][0]['attr'] = attr
+  		data['trivias'][0]['entities'] = data['entities']
       

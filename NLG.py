@@ -39,13 +39,13 @@ def handle_pref(data):
 #based on test_cases.py
 def handle_trivia(data):
   data['output']= ''
-  if data['trivia']['attr'] == 'in':
-    if data['trivia']['answer'] == False:
+  if data['trivias']['attr'] == 'in':
+    if data['trivias']['answer'] == False:
       data['output'] = 'No.'
-    if data['trivia']['answer'] == True:
+    if data['trivias']['answer'] == True:
       data['output'] = 'Yes.'
-  if data['trivia']['attr'] == 'when':
-    data['output'] = 'The production year was ' + str(data['trivia']['answer'])
+  if data['trivias']['attr'] == 'when':
+    data['output'] = 'The production year was ' + str(data['trivias']['answer'])
 
 
 def handle_chat(data):
