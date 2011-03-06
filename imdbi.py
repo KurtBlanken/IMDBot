@@ -140,22 +140,3 @@ class IMDBInterface(object):
 if __name__ == '__main__':
 	imdb = IMDBInterface()
 	ids = [line.split()[0] for line in open("title_index.txt").readlines()]
-	ratings = open('ratings.list').readlines()
-	for i, line in enumerate(ratings):
-		line = line.strip()
-		line = line.split()
-		ratings[i] = [line[0], line[1], line[2], ' '.join(line[3:])]
-	started = False
-	for id in ids:
-		if int(id) == 421104:
-			started = True
-		if not started:
-			continue			
-		print id
-		m = imdb.get_movie(id)
-		matches = []
-		for rating in ratings:
-			if m['title'] in rating[3]:
-				matches.append(rating)
-		if len(matches) == 1:
-			imdb.add_rating(m, matches[0])

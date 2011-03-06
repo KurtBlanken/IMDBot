@@ -20,18 +20,18 @@ def handle_pref(data):
   for pref in data['pos']:
     pospref=pref
     if pospref[0]=='actor':     
-      data['output'] = random.sample(['Yeah ' + str(imdbi.get_person(pospref[1])) + ' is ' + str(data['prefs'][pospref[0], pospref[1]]), 'I agree', 'Ok'], 1)
+      data['output'] = random.choice(['Yeah ' + str(imdbi.get_person(pospref[1])) + ' is ' + str(data['prefs'][pospref[0], pospref[1]]), 'I agree', 'Ok'])
     elif pospref[0]=='movie':
-      data['output'] = random.sample(['You\'re right, ' + str(imdbi.get_movie(pospref[1])) + ' is ' + str(data['prefs'][pospref[0], pospref[1]]),
-      'Yeah, I like it too.', 'Ok'], 1)
+      data['output'] = random.choice(['You\'re right, ' + str(imdbi.get_movie(pospref[1])) + ' is ' + str(data['prefs'][pospref[0], pospref[1]]),
+      'Yeah, I like it too.', 'Ok'])
     elif pospref[0]=='genre':
-      date['output'] = random.sample(['I\'m not a big fan of ' + str(pospref[1]), 'I see.'], 1)
+      date['output'] = random.choice(['I\'m not a big fan of ' + str(pospref[1]), 'I see.'])
     else:
       data['output'] = 'I don\'t know what you are talking about.'
   for pref in data['neg']:
     negpref=pref
     if negpref[0]=='actor':
-      data['output'] = random.sample(['Yeah, ' + str(imdbi.get_person(negpref[1])) + ' is ' + str(data['prefs'][negpref[0], negpref[1]]), 'Interesting.'], 1)
+      data['output'] = random.choice(['Yeah, ' + str(imdbi.get_person(negpref[1])) + ' is ' + str(data['prefs'][negpref[0], negpref[1]]), 'Interesting.'])
     elif negpref[0]=='movie':
       data['output'] = 'You\'re right, ' + str(imdbi.get_movie(negpref[1])) + ' is ' + str(data['prefs'][negpref[0], negpref[1]])
     elif negpref[0]=='genre':
@@ -59,7 +59,7 @@ def handle_trivia(data):
   if data['trivia']['attr'] == 'plot':
     data['output'] = 'Here\'s the plot: \n' + str(data['trivia']['answer'])
   if data['trivia']['attr'] == 'role':
-    data['output'] = random.sample([str(imdbi.get_person(data['entities'][0][1])) + ' played ' + str(data['trivia']['answer']), str(data['trivia']['answer'])], 1)
+    data['output'] = random.choice([str(imdbi.get_person(data['entities'][0][1])) + ' played ' + str(data['trivia']['answer']), str(data['trivia']['answer'])])
   if data['trivia']['attr'] == 'director':
     data['output'] = str(imdbi.get_person(data['trivia']['answer'])) + ' directed that.'
   if data['trivia']['attr'] == 'producer':
