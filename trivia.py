@@ -11,7 +11,7 @@ interface= imdbi.IMDBInterface()
   field to the trivias dictionary.
 '''
 def handle(data):
-	for triv in data['trivias']:
+	for triv in data['trivia']:
 		triv['answer'] = list()
 		if triv['attr'] != '':
 			triv_type = triv['attr']

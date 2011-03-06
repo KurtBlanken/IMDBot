@@ -18,7 +18,7 @@ cases = [
   'entities' : [('movie', 48368)],
 },
 [
-  '1998.',
+  '1998',
   'The production year was 1998.',
 ]
 ),
@@ -43,7 +43,8 @@ cases = [
 },
 [
   'No.',
-  "I don't think so.",
+
+
 ]
 ),
 
@@ -61,13 +62,13 @@ cases = [
 { 'act' : 'trivia',
   'trivia' : {
     'attr' : 'in',
-    'answer' : False,
+    'answer' : True,
+
   },
   'entities' : [('person', 260886), ('movie', 48368)],
 },
 [
-  'No.',
-  "I don't think so.",
+  'Yes.',
 ]
 ),
 
@@ -86,8 +87,9 @@ cases = [
   'prefs' : { ('actor', 291778) : 'hilarious' }
 },
 [
-  'Ok.',
+  'Yeah, Danny Devito is hilarious.',
   'I agree.',
+  'Ok.',
 ]
 ),
 
@@ -95,20 +97,21 @@ cases = [
 # utterance
 'I think Fubie Fubar is hilarious',
 # NLU output / dialog manager input
-{  'act' : 'pref',
+
+{ 'act' : 'pref',
   'pos' : set(),
   'neg' : set(),
 },
 # dialog manager output / NLG input
-{  'act' : 'pref',
+
+{ 'act' : 'pref',
   'pos' : set(),
   'neg' : set(),
   'prefs' : {},
 },
 [
-  "I don't understand.",
-  "I don't know about Fubie Fubar.",
-  "Huh?",
+  'Huh?',
+
 ]
 ),
 ] # end cases
@@ -144,6 +147,7 @@ for utterance, nlu_dm, dm_nlg, outputs in d['cases']:
     'errors' : [],
     'imdbi' : imdbi,
   }
+
   try:
     NLU.NLU(data)
   except Exception as err:
@@ -165,6 +169,10 @@ for utterance, nlu_dm, dm_nlg, outputs in d['cases']:
   except Exception as err:
     print 'NLG failed on', utterance
     print err
+    nlg_neg = nlg_neg + 1
   else:
-    print 'NLG'
-    print dm_nlg
+    if True in [dm_nlg['output'] == out for out in outputs]:
+		nlg_correct += 1
+	nlg_count += 1
+print 'NLG: {0} / {1} ({2:.0f}%)'.format(nlg_incorrect, nlg_correct, float(nlg_correct)/nlg_count * 100)
+
