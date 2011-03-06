@@ -3,6 +3,7 @@ import os, sys
 from threading import Thread
 import subprocess
 import json
+import imdbi
 import NLU, DM, NLG
 
 server = False
@@ -25,6 +26,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'server':
   _, w = os.pipe()
   sys.stdout = os.fdopen(w, 'w')
 
+imdb = imdbi.IMDBInterface()
 if not server:
   import readline
   try:
@@ -50,6 +52,7 @@ while 1:
     'user_utterance' : user_utterance,
     'prefs' : set(),
     'errors' : [],
+    'imdbi' : imdb,
   }
   NLU.NLU(data)
   DM.DM(data)
