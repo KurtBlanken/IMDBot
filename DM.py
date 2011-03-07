@@ -29,7 +29,7 @@ def get_initial_recs():
       movie = int(line.split()[0])
    # change this to appropriate accessor
       movie = imdbi.get_movie(movie)
-      top100.append((movie, 0))
+      top100.append([movie,0])
 
    top100_in.close()
    return top100
