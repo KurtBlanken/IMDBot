@@ -4,6 +4,7 @@ MAX_CONFIDENCE = 100
 ACTOR_VAL = 30
 DIRECTOR_VAL = 60
 WRITER_VAL = 60
+MAX_ADD = 30
 
 movie_obj = 0
 movie_confidence = 1
@@ -15,14 +16,24 @@ def handle(user_prefs, newData):
    # add preferences to the recommendation list
    for pref in newData['pos']:
       # handle actor
-      # currently just upps movies currently in list
       if pref[pref_type] == 'actor':
+         movies_in_list = []
+         movies_to_add = []
          notfound = True
+          # up movies currently in list
          for movie in user_prefs['recs']:
             if pref[pref_obj] in movie[movie_obj]['cast']
                movie[movie_confidence] += ACTOR_VAL
-               notfound = False
-               break
+               movies_in_list.append(movie)
+         # add other movies by actor
+         for movie in pref[pref_obj]['actor']:
+            if movie not in movies_in_list and movie['kind'] == 'movie':
+               movies_to_add.append([movie, ACTOR_VAL])
+         ## rating likely has to be updated for each movie for this to work
+         movies_to_add.sort(key=lambda rating: rating[movie_obj]['rating'], reverse=True)
+         del movies_to_add[30:]
+         user_prefs['recs'].extend(movies_to_add)
+               
       # handle movie
       elif pref[pref_type] == 'movie':
          notfound = True
