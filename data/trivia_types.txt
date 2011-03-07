@@ -23,11 +23,11 @@ What movies was PERSON last in?, last
 Name movies PERSON has recently filmed., recent
 Name some movies PERSON has recently been in., recent
 PERSON has been in how many films?, acted
+How many films has PERSON been in?, acted
 PERSON has produced how many films?, produced
+How many films has PERSON produced?, produced
 PERSON has directed how many movies?, directed
-PERSON has directed how many movies?, directed
-PERSON has been in how many movies?, acted
-PERSON has produced how many movies?, produced
+How many movies has PERSON directed?, directed
 What was MOVIE about?, plot
 What was the movie MOVIE about?, plot
 What happened in MOVIE?, plot
@@ -38,6 +38,6 @@ Did PERSON direct a movie named MOVIE?, director
 What month was PERSON born?, when
 What year was PERSON born?, when
 What year was MOVIE first released in a movie theater?, when
-What did PERSON do in MOVIE? role
-What was PERSON's job in MOVIE? role
-What was PERSON known for in MOVIE? role
+What did PERSON do in MOVIE?, role
+What was PERSON's job in MOVIE?, role
+What was PERSON known for in MOVIE?, role

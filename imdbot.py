@@ -36,6 +36,7 @@ if not server:
   import atexit
   atexit.register(readline.write_history_file, 'hist')
   print DM.get_introduction()
+  
 while 1:
   if server:
     id = sys.stdin.readline().strip()
@@ -55,8 +56,8 @@ while 1:
     'imdbi' : imdb,
   }
   NLU.NLU(data)
-  #DM.DM(data)
-  #NLG.NLG(data)
+  DM.DM(data)
+  NLG.NLG(data)
   for key, value in data.items():
     if type(value) == type(set()):
       data[key] = list(value)
@@ -65,8 +66,7 @@ while 1:
   if server:
     sys.stderr.write('> ' + user_utterance + '\n')
     sys.stderr.write('< ' + result + '\n')
-  print data['output']
-  '''sys.stdout.write(result + '\n')
-  sys.stdout.flush()
-  '''
+  sys.stdout.write(result + '\n')
+  sys.stdout.flush()  
+  
 os.remove('/tmp/imdbot_pid')

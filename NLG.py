@@ -1,19 +1,14 @@
 import random, re
+import sys
 
 def NLG(data):
-
-  if data['act'] == 'pref':
-    handle_pref(data)
-  elif data['act'] == 'trivia':
-    handle_trivia(data)
-  elif data['act'] == 'chat':
-    handle_chat(data)
-  else:
-    data['output'] = "I don't know."
-
+	# dynamically direct the function call based on the dialog act
+	# to introduce a new act, just create a function with the same name
+	module = sys.modules[globals()['__name__']]
+	module.__dict__[data['act']].__call__(data)
 
 #handles pos and neg prefs for actors, genres, and movies
-def handle_pref(data):
+def pref(data):
   data['output'] = ''
   for pref in data['pos'].union(data['neg']):
     data['output'] = random.choice([
@@ -22,8 +17,7 @@ def handle_pref(data):
     ])
 
 #handles in, when, plot, role, director, producer
-def handle_trivia(data):
-  data['output'] = ''
+def trivia(data):
   if data['trivia']['attr'] == 'in':
     if data['trivia']['answer'] == False:
       data['output'] = 'No.'
@@ -37,16 +31,21 @@ def handle_trivia(data):
         if count == 5:
           break
   if data['trivia']['attr'] == 'when':
-    data['output'] = random.choice(['The production year was {0}.'.format(data['trivia']['answer']), str(data['trivia']['answer'])])
+    data['output'] = random.choice([
+    	'The production year was {0}.'.format(
+    		data['trivia']['answer'],
+    		data['trivia']['answer']),
+    ])
   if data['trivia']['attr'] == 'plot':
-    data['output'] = 'Here\'s the plot: \n' + str(data['trivia']['answer'])
+    data['output'] = "Here's the plot: \n {0}".format(data['trivia']['answer'])
   if data['trivia']['attr'] == 'role':
-    data['output'] = random.choice([str(imdbi.get_person(data['entities'][0][1])) + ' played ' + str(data['trivia']['answer']), str(data['trivia']['answer'])])
+    data['output'] = random.choice([
+    	'{0} played {1}.'.format(imdbi.get_person(data['entities'][0][1]), data['trivia']['answer']),
+    ])
   if data['trivia']['attr'] == 'director':
-    data['output'] = str(imdbi.get_person(data['trivia']['answer'])) + ' directed that.'
+    data['output'] = '{0} directed that.'.format(imdbi.get_person(data['trivia']['answer']))
   if data['trivia']['attr'] == 'producer':
-    data['output'] = str(imdbi.get_person(data['trivia']['answer'])) + ' was the producer.'
+    data['output'] = '{0} was the producer.'.format(imdbi.get_person(data['trivia']['answer']))
 
-
-def handle_chat(data):
+def chat(data):
   data['output'] = 'chat stuff goes here'
