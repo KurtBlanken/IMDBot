@@ -1,6 +1,43 @@
-Was person in movie?, in
-What's the plot of movie?, plot
-When was movie made?, when
-What role did person play in movie?, role
-Who directed movie?, director
-Who produced movie?, producer
+Was PERSON in MOVIE?, in
+What's the plot of MOVIE?, plot
+When was MOVIE made?, when
+What role did PERSON play in MOVIE?, role
+Who directed MOVIE?, director
+Who produced MOVIE?, producer
+Did PERSON produce MOVIE?, producer
+Did PERSON direct MOVIE?, director
+MOVIE was directed by person?, director
+Did PERSON play in MOVIE?, in
+Who did PERSON play in MOVIE?, role
+Who was that character PERSON played in MOVIE?, role
+MOVIE had PERSON right?, in
+MOVIE had PERSON?, in
+That MOVIE had PERSON?, in
+What movies had PERSON?, recent
+When was MOVIE first screened?, when
+When was PERSON born?, when
+When did MOVIE come out?, when
+How many films has PERSON been in?, acted
+How many films did PERSON direct?, directed
+What movies was PERSON last in?, last
+Name movies PERSON has recently filmed., recent
+Name some movies PERSON has recently been in., recent
+PERSON has been in how many films?, acted
+PERSON has produced how many films?, produced
+PERSON has directed how many movies?, directed
+PERSON has directed how many movies?, directed
+PERSON has been in how many movies?, acted
+PERSON has produced how many movies?, produced
+What was MOVIE about?, plot
+What was the movie MOVIE about?, plot
+What happened in MOVIE?, plot
+I want to know more about MOVIE?, plot
+Tell me more about MOVIE., plot
+Did PERSON produce a movie titled MOVIE?, producer
+Did PERSON direct a movie named MOVIE?, director
+What month was PERSON born?, when
+What year was PERSON born?, when
+What year was MOVIE first released in a movie theater?, when
+What did PERSON do in MOVIE? role
+What was PERSON's job in MOVIE? role
+What was PERSON known for in MOVIE? role

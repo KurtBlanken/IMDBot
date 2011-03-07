@@ -44,6 +44,7 @@ cases = [
 [
   'No.',
   "I don't think so.",
+
 ]
 ),
 
@@ -100,6 +101,7 @@ cases = [
   'neg' : set(),
 },
 # dialog manager output / NLG input
+
 { 'act' : 'pref',
   'pos' : set(),
   'neg' : set(),

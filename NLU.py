@@ -1,5 +1,5 @@
 import nltk
-import NERDb
+import NERDb, DM
 from Ontology import *
 
 contractions = {
@@ -14,8 +14,8 @@ nerdb = NERDb.NERDb()
 porter= nltk.PorterStemmer()
 
 prefs = [line.strip() for line in open('preferences.txt').readlines() if len(line.strip()) > 0]
-pos = prefs[prefs.index("# pos")+1:prefs.index("# neg")]
-neg = prefs[prefs.index("# neg")+1:]
+pos = set(prefs[prefs.index("# pos")+1:prefs.index("# neg")])
+neg = set(prefs[prefs.index("# neg")+1:])
 trivias = [line.strip().split(', ') for line in open('trivia_types.txt').readlines()]
 numbers = eval(open('numbers.txt').read())
 
@@ -29,24 +29,19 @@ def uncontract(word):
   
 def NLU(data):
   # uncontract and tokenize utterance
+  '''
+  Input: {'errors': [], 'prefs': set([]), 'imdbi': <imdbi.IMDBInterface object at 0x10a334350>, 'id': 'console', 'user_utterance': 'Who directed Armageddon?'}
+  '''
   words = [uncontract(word) for word in nltk.word_tokenize(data['user_utterance'])]
   # tag words with saved tagger
   tagged_words = nltk.pos_tag(nltk.word_tokenize(data['user_utterance']))
   entitites= set()
-  
-  
-  words = nltk.word_tokenize(data['user_utterance'])
-  
   sentence= data['user_utterance']
-  for word in words:
-  	if word.isdigit():
-  		if word in numbers:
-  			sentence= sentence.replace(word, numbers[word].title())
-  			
+  
   #print sentence
   # get any recognized entities
   entities = nerdb.get_entities(sentence)
-  print entities
+  #print entities
   data['tagged_words'] = tagged_words
   data['entities'] = map(lambda (type_name, id, s): (type_name, id), entities)
   #print entities
@@ -94,9 +89,14 @@ def NLU(data):
     schema = schema.replace(s, type_name)
   data['schema'] = schema
   for schema, attr in trivias:
-    if schema in data['schema']:
-      data['act'] = 'trivia'
-      data['trivias'] = [{}]
-      data['trivias'][0]['attr'] = attr
-      data['trivias'][0]['entities'] = data['entities']
+  	if schema in data['schema']:
+  		data['act'] = 'trivia'
+  		data['trivia'] = {}
+  		data['trivia']['attr'] = attr
+  		data['trivia']['entities'] = data['entities']
+  		
+  
+  # pass data into DM
+  #print data
+  DM.DM(data)
       

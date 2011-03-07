@@ -1,8 +1,7 @@
-import random
-from imdbi import IMDBInterface
+import random, re
 
 def NLG(data):
-  imdbi = IMDBInterface()
+
   if data['act'] == 'pref':
     handle_pref(data)
   elif data['act'] == 'trivia':
@@ -12,6 +11,7 @@ def NLG(data):
   else:
     data['output'] = "I don't know."
 
+
 #handles pos and neg prefs for actors, genres, and movies
 def handle_pref(data):
   data['output'] = ''
@@ -20,7 +20,7 @@ def handle_pref(data):
       'I agree.',
       'Ok.',
     ])
-    
+
 #handles in, when, plot, role, director, producer
 def handle_trivia(data):
   data['output'] = ''

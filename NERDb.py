@@ -25,7 +25,7 @@ class ConsecutiveNPChunker(nltk.ChunkParserI):
   def parse(self, sentence):
     #tagged_sent = self.tagger.tag(nltk.word_tokenize(sentence))
     #tagged_sent = nltk.pos_tag(nltk.word_tokenize(sentence))
-    tagged_sent= nltk.pos_tag(re.split(r'[ \n!#$%&\*^()/]+',sentence))
+    tagged_sent= nltk.pos_tag(re.split(r'[ \n!#$%&\*^()/?.]+',sentence))
     #tagged_sent= nltk.pos_tag(nltk.word_tokenize(sentence.replace("'", '').replace(',', '')))
     history = []
     for i, word in enumerate(tagged_sent):
@@ -37,59 +37,73 @@ class ConsecutiveNPChunker(nltk.ChunkParserI):
     return nltk.chunk.conlltags2tree(conlltags)
 
 class NERDb():
-  def __init__(self):
-    try:
-      tagger = cPickle.load(open('nerdb_tagger.pkl'))
-    except IOError:
-      print 'failed to load nerdb_tagger, recreating...'
-      train_sents = conll2000.tagged_sents() + brown.tagged_sents()
-      tagger = nltk.DefaultTagger('NN')
-      tagger = nltk.UnigramTagger(train_sents, backoff=tagger)
-      tagger = nltk.BigramTagger(train_sents, backoff=tagger)
-      tagger = nltk.TrigramTagger(train_sents, backoff=tagger)
-      cPickle.dump(tagger, open('nerdb_tagger.pkl', 'w'))
-      print 'done'
-    try:
-      chunker = cPickle.load(open('nerdb_chunker.pkl'))
-    except IOError:
-      print 'failed to load nerdb_chunker, recreating...'
-      train_sents = conll2000.chunked_sents()
-      chunker = ConsecutiveNPChunker(tagger, train_sents)
-      cPickle.dump(chunker, open('nerdb_chunker.pkl', 'w'))
-      print 'done'
-    self.chunker = chunker
-    self.people = [line.strip().split(" ", 1) for line in open('actors_index.txt').readlines()]
-    self.people += [line.strip().split(" ", 1) for line in open('actresses_index.txt').readlines()]
-    self.movies = [line.strip().split(" ", 1) for line in open('title_index.txt').readlines()]
-    self.entity_types = {'PERSON' : self.people, 'MOVIE' : self.movies}
-    
-  def search(self, s, t):
-    for type_name, entities in self.entity_types.items():
-      matches = find_matches(s, type_name, entities, t)
-      if len(matches) > 0:
-        return matches[0][1]
-    return None
+	def __init__(self):
+		try:
+			tagger = cPickle.load(open('nerdb_tagger.pkl'))
+		except IOError:
+			print 'failed to load nerdb_tagger, recreating...'
+			train_sents = conll2000.tagged_sents() + brown.tagged_sents()
+			tagger = nltk.DefaultTagger('NN')
+			tagger = nltk.UnigramTagger(train_sents, backoff=tagger)
+			tagger = nltk.BigramTagger(train_sents, backoff=tagger)
+			tagger = nltk.TrigramTagger(train_sents, backoff=tagger)
+			cPickle.dump(tagger, open('nerdb_tagger.pkl', 'w'))
+			print 'done'
+		try:
+			chunker = cPickle.load(open('nerdb_chunker.pkl'))
+		except IOError:
+			print 'failed to load nerdb_chunker, recreating...'
+			train_sents = conll2000.chunked_sents()
+			chunker = ConsecutiveNPChunker(tagger, train_sents)
+			cPickle.dump(chunker, open('nerdb_chunker.pkl', 'w'))
+			print 'done'
+		self.chunker = chunker
+		self.people = [line.strip().split(" ", 1) for line in open('actors_index.txt').readlines()]
+		self.people += [line.strip().split(" ", 1) for line in open('actresses_index.txt').readlines()]
+		self.movies = [line.strip().split(" ", 1) for line in open('title_index.txt').readlines()]
+		self.entity_types = {'PERSON' : self.people, 'MOVIE' : self.movies}
+		self.numbers = eval(open('numbers.txt').read())
+		 
+	def search(self, s, t):
+		 for type_name, entities in self.entity_types.items():
+			matches = find_matches(s, type_name, entities, t)
+			if len(matches) > 0:
+			  return matches[0][1]
+		 return None
 
-  def get_entities(self, sentence):
-    found = set()
-    tree = self.chunker.parse(sentence)
-    #print tree
-    for child in tree.subtrees():
-      if child.node == 'NP':
-        match = self.search(' '.join(map(lambda x: x[0], child.leaves())), 0.9)
-        if match:
-          found.add(match)
-    #tokens = nltk.word_tokenize(sentence.replace("'", '').replace(',', ''))
-    tokens = re.split(r'[ \n!#$%&\*^()/]+',sentence)
-    #print tokens
-    for i in range(len(tokens)):
-      for j in range(1,len(tokens)):
-        if i+j+1 < len(tokens):
-          substring = ' '.join(tokens[i:i+j+1])
-          match = self.search(substring, 0.99)
-          if match:
-            found.add(match)
-    return found
+	def get_entities(self, sentence):
+		found = set()
+		sent_list= []
+		sent_list.append(sentence)
+		# check for numbers to check if there are matches
+		words= re.split(r'[ \n!#$%&\*^()/.?]+',sentence)
+		for word in words:
+			if word.isdigit():
+				if word in self.numbers:
+					replaced= sentence.replace(word, self.numbers[word].title())
+					sent_list.append(replaced) 			
+		for sentence in sent_list:
+		 	tree = self.chunker.parse(sentence)
+		 	# print tree
+		 	for child in tree.subtrees():
+		 		if child.node == 'NP':
+		 			match = self.search(' '.join(map(lambda x: x[0], child.leaves())), 0.9)
+		 			if match:
+		 				#print match
+		 				found.add(match)
+		 	#tokens = nltk.word_tokenize(sentence.replace("'", '').replace(',', ''))
+		 	tokens = re.split(r'[ \n!#$%&\*^()/.?]+',sentence)
+		 	#print tokens
+		 	for i in range(len(tokens)):
+		 		for j in range(1,len(tokens)):
+		 			if i+j+1 < len(tokens):
+		 				substring = ' '.join(tokens[i:i+j+1])
+		 				#print substring
+		 				match = self.search(substring, 0.9)
+		 				if match:
+		 					#print match
+		 					found.add(match)
+		return found
 
 def tags_since_dt(sentence, i):
   tags = set()

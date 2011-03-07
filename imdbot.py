@@ -55,8 +55,8 @@ while 1:
     'imdbi' : imdb,
   }
   NLU.NLU(data)
-  DM.DM(data)
-  NLG.NLG(data)
+  #DM.DM(data)
+  #NLG.NLG(data)
   for key, value in data.items():
     if type(value) == type(set()):
       data[key] = list(value)
@@ -65,7 +65,8 @@ while 1:
   if server:
     sys.stderr.write('> ' + user_utterance + '\n')
     sys.stderr.write('< ' + result + '\n')
-  sys.stdout.write(result + '\n')
+  print data['output']
+  '''sys.stdout.write(result + '\n')
   sys.stdout.flush()
-  
+  '''
 os.remove('/tmp/imdbot_pid')
