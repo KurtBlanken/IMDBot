@@ -7,41 +7,23 @@ def NLG(data):
     handle_pref(data)
   elif data['act'] == 'trivia':
     handle_trivia(data)
-  #elif data['act'] == 'chat':
-   # handle_chat(data)
-  #elif data['act'] == 'rec':
-   # handle_rec(data)
+  elif data['act'] == 'chat':
+    handle_chat(data)
   else:
-    data['output'] = "I don't know"
+    data['output'] = "I don't know."
 
 #handles pos and neg prefs for actors, genres, and movies
 def handle_pref(data):
-  data['output']=''
-  for pref in data['pos']:
-    pospref=pref
-    if pospref[0]=='actor':     
-      data['output'] = random.choice(['Yeah ' + str(imdbi.get_person(pospref[1])) + ' is ' + str(data['prefs'][pospref[0], pospref[1]]), 'I agree', 'Ok'])
-    elif pospref[0]=='movie':
-      data['output'] = random.choice(['You\'re right, ' + str(imdbi.get_movie(pospref[1])) + ' is ' + str(data['prefs'][pospref[0], pospref[1]]),
-      'Yeah, I like it too.', 'Ok'])
-    elif pospref[0]=='genre':
-      date['output'] = random.choice(['I\'m not a big fan of ' + str(pospref[1]), 'I see.'])
-    else:
-      data['output'] = 'I don\'t know what you are talking about.'
-  for pref in data['neg']:
-    negpref=pref
-    if negpref[0]=='actor':
-      data['output'] = random.choice(['Yeah, ' + str(imdbi.get_person(negpref[1])) + ' is ' + str(data['prefs'][negpref[0], negpref[1]]), 'Interesting.'])
-    elif negpref[0]=='movie':
-      data['output'] = 'You\'re right, ' + str(imdbi.get_movie(negpref[1])) + ' is ' + str(data['prefs'][negpref[0], negpref[1]])
-    elif negpref[0]=='genre':
-      date['output'] = 'I\'m not a big fan of ' + str(negpref[1])
-    else:
-      data['output'] = 'Huh?'
+  data['output'] = ''
+  for pref in data['pos'].union(data['neg']):
+    data['output'] = random.choice([
+      'I agree.',
+      'Ok.',
+    ])
     
 #handles in, when, plot, role, director, producer
 def handle_trivia(data):
-  data['output']= ''
+  data['output'] = ''
   if data['trivia']['attr'] == 'in':
     if data['trivia']['answer'] == False:
       data['output'] = 'No.'
@@ -66,8 +48,5 @@ def handle_trivia(data):
     data['output'] = str(imdbi.get_person(data['trivia']['answer'])) + ' was the producer.'
 
 
-#def handle_chat(data):
- # data['output'] = 'chat stuff goes here'
-
-#def handle_rec(data):
- # data['output'] = 'rec stuff goes here'
+def handle_chat(data):
+  data['output'] = 'chat stuff goes here'

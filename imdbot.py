@@ -60,7 +60,7 @@ while 1:
   for key, value in data.items():
     if type(value) == type(set()):
       data[key] = list(value)
-  #print data
+  del data['imdbi']
   result = json.dumps(data)
   if server:
     sys.stderr.write('> ' + user_utterance + '\n')
