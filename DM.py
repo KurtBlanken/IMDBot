@@ -23,7 +23,7 @@ def get_introduction():
   return "Welcome to IMDBot"
   
 def get_initial_recs():
-   top100_in = open('top100.txt', 'r')
+   top100_in = open('data/top100.txt', 'r')
    top100 = []
    while True:
       line = top100_in.readline()

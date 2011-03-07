@@ -13,11 +13,11 @@ nerdb = NERDb.NERDb()
 
 porter= nltk.PorterStemmer()
 
-prefs = [line.strip() for line in open('preferences.txt').readlines() if len(line.strip()) > 0]
+prefs = [line.strip() for line in open('data/preferences.txt').readlines() if len(line.strip()) > 0]
 pos = set(prefs[prefs.index("# pos")+1:prefs.index("# neg")])
 neg = set(prefs[prefs.index("# neg")+1:])
-trivias = [line.strip().split(', ') for line in open('trivia_types.txt').readlines()]
-numbers = eval(open('numbers.txt').read())
+trivias = [line.strip().split(', ') for line in open('data/trivia_types.txt').readlines()]
+numbers = eval(open('data/numbers.txt').read())
 
 
 # Remove contractions from word

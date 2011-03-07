@@ -4,7 +4,7 @@ from collections import defaultdict
 
 class IMDBInterface(object):
 	def __init__(self):
-		dbinfo = eval(open('dbinfo.txt').read())
+		dbinfo = eval(open('data/dbinfo.txt').read())
 
 		try:
 			conn = MySQLdb.connect(host='127.0.0.1',
@@ -139,4 +139,4 @@ class IMDBInterface(object):
 			
 if __name__ == '__main__':
 	imdb = IMDBInterface()
-	ids = [line.split()[0] for line in open("title_index.txt").readlines()]
+	ids = [line.split()[0] for line in open("data/title_index.txt").readlines()]

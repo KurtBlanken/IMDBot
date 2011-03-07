@@ -58,11 +58,11 @@ class NERDb():
 			cPickle.dump(chunker, open('nerdb_chunker.pkl', 'w'))
 			print 'done'
 		self.chunker = chunker
-		self.people = [line.strip().split(" ", 1) for line in open('actors_index.txt').readlines()]
-		self.people += [line.strip().split(" ", 1) for line in open('actresses_index.txt').readlines()]
-		self.movies = [line.strip().split(" ", 1) for line in open('title_index.txt').readlines()]
+		self.people = [line.strip().split(" ", 1) for line in open('data/actors_index.txt').readlines()]
+		self.people += [line.strip().split(" ", 1) for line in open('data/actresses_index.txt').readlines()]
+		self.movies = [line.strip().split(" ", 1) for line in open('data/title_index.txt').readlines()]
 		self.entity_types = {'PERSON' : self.people, 'MOVIE' : self.movies}
-		self.numbers = eval(open('numbers.txt').read())
+		self.numbers = eval(open('data/numbers.txt').read())
 		 
 	def search(self, s, t):
 		 for type_name, entities in self.entity_types.items():

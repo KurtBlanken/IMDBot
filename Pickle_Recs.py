@@ -9,8 +9,8 @@ URI = 'mysql://root:team5@localhost/imdb'
 id = 'console'
 imdb_access = imdb.IMDb('sql', uri=URI)
 DEFAULT_MOVIE = ('DEFAULT MOST DIFFERENT MOVIE', 100, 0)
-Movie_list_master = open("title_index.txt", "r")
-Rec_Out = open("recommendations.txt", "w")
+Movie_list_master = open("data/title_index.txt", "r")
+Rec_Out = open("data/recommendations.txt", "w")
 
 # the diff comparing for loop
 # the primary movie
@@ -20,7 +20,7 @@ for i in range(10):
    movie1 = imdb_access.get_movie(movie_id_master)
    print 'Processing movie #',i,': ',movie1['title']
    top5 = [DEFAULT_MOVIE]
-   Movie_list_parser = open("title_index.txt", "r")
+   Movie_list_parser = open("data/title_index.txt", "r")
    
    #movies being compared to the primary movie
    for j in range(100):

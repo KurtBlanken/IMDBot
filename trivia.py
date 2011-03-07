@@ -15,7 +15,7 @@ import random
 import imdb
 import datetime
 
-dbinfo = eval(open('dbinfo.txt').read())
+dbinfo = eval(open('data/dbinfo.txt').read())
 user = dbinfo['user']
 pw = dbinfo['passwd']
 db = dbinfo['db']
