@@ -60,7 +60,6 @@ salient
 spectacular
 prominent
 bright
-
 like
 love
 adore
@@ -69,9 +68,6 @@ care
 honour
 value
 esteem
-
-
-
 # neg
 stupid
 ugly
@@ -126,7 +122,6 @@ horrifying
 defective
 unfit
 bad
-
 despise
 hate
 suck

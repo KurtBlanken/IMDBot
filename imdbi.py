@@ -46,8 +46,13 @@ class IMDBInterface(object):
 		self.info_type_id = {}
 		for key, value in self.type_map['info_type_id'][1].items():
 			self.info_type_id[value] = key
+		
+		self.movie_cache = {}
+		self.person_cache = {}
 
 	def get_movie(self, id, movie_info=True, info_keys="*", cast_info=True):
+		if id in self.movie_cache:
+			return self.movie_cache[id]
 		self.cur.execute('SELECT * FROM title WHERE id={0}'.format(id))
 		res = self.cur.fetchall()
 		assert len(res) == 1
@@ -69,11 +74,19 @@ class IMDBInterface(object):
 				d[d2['info_type']].append(d2['info'])
 		if cast_info:
 			d['cast'] = self.get_cast_info(id)
+			for i, member in enumerate(d['cast']):
+					member['formal_name'] = member['name']
+					if len(member['formal_name'].split(",")) > 1:
+						names = [name.strip() for name in member['formal_name'].split(",")]
+						names.reverse()
+						member['name'] = ' '.join(names)
+					d['cast'][i] = member
 			d['actors'] = filter(lambda i: 'role_type' in i and i['role_type'] == 'actor', d['cast'])
 			d['actresses'] = filter(lambda i: 'role_type' in i and i['role_type'] == 'actress', d['cast'])
 			d['writers'] = filter(lambda i: 'role_type' in i and i['role_type'] == 'writer', d['cast'])
 			d['directors'] = filter(lambda i: 'role_type' in i and i['role_type'] == 'director', d['cast'])
 			d['producers'] = filter(lambda i: 'role_type' in i and i['role_type'] == 'producer', d['cast'])
+		self.movie_cache[id] = d
 		return d
 	
 	def get_cast_info(self, id):
@@ -99,6 +112,8 @@ class IMDBInterface(object):
 		return cast_info
 	
 	def get_person(self, id):
+		if id in self.person_cache:
+			return self.person_cache[id]
 		self.cur.execute('SELECT * FROM name WHERE id={0}'.format(id))
 		res = self.cur.fetchall()
 		assert len(res) == 1
@@ -114,6 +129,12 @@ class IMDBInterface(object):
 				if d2['role_type'] not in d:
 					d[d2['role_type']] = set()
 				d[d2['role_type']].add(d2['movie_id'])
+		d['formal_name'] = d['name']
+		if len(d['formal_name'].split(",")) > 1:
+			names = [name.strip() for name in d['formal_name'].split(",")]
+			names.reverse()
+			d['name'] = ' '.join(names)
+		self.person_cache[id] = d
 		return d
 		
 	def get_movie_ids(self):
@@ -140,3 +161,13 @@ class IMDBInterface(object):
 if __name__ == '__main__':
 	imdb = IMDBInterface()
 	ids = [line.split()[0] for line in open("data/title_index.txt").readlines()]
+	import sys
+	for i, id in enumerate(ids):
+		sys.stderr.write("{0}\n".format(float(i)/len(ids)))
+		m = imdb.get_movie(id, movie_info=False)
+		for director in m['directors']:
+			print director['person_id'], director['name']
+		for director in m['writers']:
+			print director['person_id'], director['name']
+		for director in m['producers']:
+			print director['person_id'], director['name']

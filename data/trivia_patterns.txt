@@ -1,0 +1,27 @@
+plot, MOVIE | plot
+about, MOVIE | plot
+happened, MOVIE | plot
+made, MOVIE | when
+out, MOVIE | when
+born, PERSON | when
+play, PERSON, MOVIE | role
+played, PERSON, MOVIE | role
+role, PERSON, MOVIE | role
+director, MOVIE | director
+directed, MOVIE | director
+produced, MOVIE | producer
+producer, MOVIE | producer
+producer, PERSON, MOVIE | was_producers
+produce, PERSON, MOVIE | was_producers
+produced, PERSON, MOVIE | was_producers
+director, PERSON, MOVIE | was_directors
+directed, PERSON, MOVIE | was_directors
+direct, PERSON, MOVIE | was_directors
+in, PERSON, MOVIE | was_actors_actresses
+has, MOVIE, PERSON | was
+had, MOVIE, PERSON | was
+had, PERSON | recent
+been, PERSON | recent
+screened, MOVIE | when
+many, been, in, PERSON | count_films
+PERSON | recent

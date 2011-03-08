@@ -3,8 +3,8 @@ import os, sys
 from threading import Thread
 import subprocess
 import json
+import NLU, DM
 import imdbi
-import NLU, DM, NLG
 
 server = False
 if len(sys.argv) > 1 and sys.argv[1] == 'server':
@@ -52,21 +52,27 @@ while 1:
     'id' : id,
     'user_utterance' : user_utterance,
     'prefs' : set(),
-    'errors' : [],
     'imdbi' : imdb,
+    'outputs' : [],
+    'act' : None,
   }
   NLU.NLU(data)
   DM.DM(data)
-  NLG.NLG(data)
   for key, value in data.items():
     if type(value) == type(set()):
       data[key] = list(value)
+  NLU.add_entity_names(data)
   del data['imdbi']
   result = json.dumps(data)
   if server:
     sys.stderr.write('> ' + user_utterance + '\n')
     sys.stderr.write('< ' + result + '\n')
-  sys.stdout.write(result + '\n')
+  if server:
+  	sys.stdout.write(result + '\n')
+  else:
+  	sys.stdout.write(result + '\n')
+  	for output in data['outputs']:
+  		sys.stdout.write(str(output) + '\n')
   sys.stdout.flush()  
   
 os.remove('/tmp/imdbot_pid')

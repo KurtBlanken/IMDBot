@@ -29,14 +29,14 @@ cases = [
 # NLU output / dialog manager input
 { 'act' : 'trivia',
 	'trivia' : {
-		'attr' : 'in',
+		'attr' : 'is_in',
 	},
 	'entities' : [('person', 260886), ('movie', 48368)],
 },
 # dialog manager output / NLG input
 { 'act' : 'trivia',
 	'trivia' : {
-		'attr' : 'in',
+		'attr' : 'is_in',
 		'answer' : False,
 	},
 	'entities' : [('person', 260886), ('movie', 48368)],
@@ -54,14 +54,14 @@ cases = [
 # NLU output / dialog manager input
 { 'act' : 'trivia',
 	'trivia' : {
-		'attr' : 'in',
+		'attr' : 'is_in',
 	},
 	'entities' : [('person', 8590), ('movie', 48368)],
 },
 # dialog manager output / NLG input
 { 'act' : 'trivia',
 	'trivia' : {
-		'attr' : 'in',
+		'attr' : 'is_in',
 		'answer' : True,
 	},
 	'entities' : [('person', 260886), ('movie', 48368)],
@@ -115,7 +115,7 @@ cases = [
 
 ## PYTHON CODE ##
 if __name__ == '__main__':
-	import NLU, DM, NLG
+	import NLU, DM
 	from imdbi import IMDBInterface
 	imdbi = IMDBInterface()
 	lines = open('test_cases.py').readlines()
@@ -164,15 +164,3 @@ if __name__ == '__main__':
 		else:
 			print 'DM'
 			print nlu_dm
-		try:
-			NLG.NLG(dm_nlg)
-		except Exception as err:
-			print 'NLG failed on', utterance
-			print err
-		else:
-			if dm_nlg['output'] in outputs:
-				nlg_correct += 1
-			else:
-				print type(dm_nlg['output'])
-			nlg_count += 1
-	print 'NLG: {0} / {1} ({2:.0f}%)'.format(nlg_correct, nlg_count, float(nlg_correct)/nlg_count * 100)

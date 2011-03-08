@@ -13,6 +13,7 @@
 	}
 	#chat {
 		margin-left: 20px;
+		float: left;
 	}
 	#responses {
 		height: 200px;
@@ -25,7 +26,12 @@
 	#responses p {
 		padding-left: 5px;
 	}
-	#prefs {
+	#recs {
+		height: 230px;
+		overflow: auto;
+		float: left;
+	}
+	#pos, #neg, #recs, #debug {
 		border: 1px solid black;
 		border-radius: 15px;
 		float: left;
@@ -34,13 +40,14 @@
 		min-width: 300px;
 		min-height: 2em;
 	}
-	#prefs h1 {
+	#pos h1, #neg h1, #recs h1, #debug h1 {
 		font-size: 1em;
 		padding-top: 5px;
 		padding-left: 15px;
 	}
-	#prefs p {
+	#pos p, #neg p, #recs p, #debug p {
 		padding-left: 25px;
+		padding-right: 25px;
 	}
 	input {
 		width: 498px;
@@ -51,16 +58,31 @@
 $(document).ready(function(){
 	socket = new WebSocket("ws://" + window.location.hostname + ":8081/ws");  
 	socket.onmessage = function(msg){
+		console.log("got msg");
 		msg = JSON.parse(msg.data);
 		response = JSON.parse(msg["response"]);
+		console.log(response);
 		$("#responses").append("<p>" + response["id"] + ": " + response["user_utterance"] + "</p>");
-		$("#responses").append("<p>IMDBot: " + response['output'] + "</p>");
-		$("#responses").scrollTop(1000000000);
-		$("#prefs").children("p").remove();
-		prefs = response["prefs"];
-		for (p in prefs) {
-			$("#prefs").children("h1").after("<p>" + prefs[p][1] + "</p>");
+		for (i in response["outputs"]) {
+			$("#responses").append("<p>IMDBot: " + response['outputs'][i] + "</p>");
 		}
+		$("#responses").scrollTop(1000000000);
+		$("#recs").children("p").remove();
+		$("#pos").children("p").remove();
+		$("#neg").children("p").remove();
+		$("#debug").children("p").remove();
+		for (p in response["recs"]) {
+			$("#recs").children("h1").after("<p>" + response["recs"][p][1] + "</p>");
+		}
+		for (p in response["pos"]) {
+			id = response["pos"][p][1];
+			$("#pos").children("h1").after("<p>" + response['entity_names'][id] + "</p>");
+		}
+		for (p in response["neg"]) {
+			id = response["neg"][p][1];
+			$("#neg").children("h1").after("<p>" + response['entity_names'][id] + "</p>");
+		}
+		$("#debug").children("h1").after("<p>Schema: " + response['schema'] + "</p>");
 	};
 	$("input").keydown(function(event) {
 		if (event.keyCode == 13) {
@@ -77,9 +99,19 @@ $(document).ready(function(){
 	</div>
 	<input type="text"></input>
 </div>
+<div id="recs">
+	<h1>Recommendations</h1>
+</div>
 <div style="clear:both"></div>
-<div id="prefs">
-	<h1>Preferences</h1>
+<div id="pos">
+	<h1>Positive Preferences</h1>
+</div>
+<div id="neg">
+	<h1>Negative Preferences</h1>
+</div>
+<div style="clear:both"></div>
+<div id="debug">
+	<h1>Debug</h1>
 </div>
 
 </body>
