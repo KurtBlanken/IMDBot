@@ -28,14 +28,51 @@ def get_introduction():
 	return "Welcome to IMDBot"
 	
 def get_initial_recs(data):
-	recs = [line.split(" ", 1) for line in open('data/top100.txt').readlines()]
-	recs = [(long(id), title.strip(), 0) for id, title in recs]
-	recs.sort(key=lambda x: x[2], reverse=True)
+	recs = [line.split(" ", 1) for line in open('data/top20.txt').readlines()]
+	recs = [[long(id), title.strip(), 0] for id, title in recs] # changed from tuple to list for assignment
+	# recs.sort(key=lambda x: x[2], reverse=True)
 	return recs
 
 def update_recommendations(data):
-	pass
-	 
+   REC_LEN = 20
+   ACTOR_VAL = 15
+   movies_to_add = []
+   # preferences
+   ##### NOTE #####
+   #
+   #  I have no method of not redoing preferences every time this function is called right now
+   #
+   ################
+   for entity in data['pos']:
+      if entity[0] == 'PERSON':
+         person = data['imdbi'].get_person(entity[1])
+         # if person is an actor
+         if 'actor' in person:
+            # change confidence for rec list
+            for movie in data['recs']:
+               movieID = movie[0]
+               if movieID in person['actor']:
+                  movie[2] += ACTOR_VAL
+            # add movies to rec list
+#            for movieID in person['actor']:
+#               movie = data['imdbi'].get_movie(movieID)
+#               print movie['id'],'\t',movie['title']
+#               if movie['id'] == data['recs'][1][0]:
+#                  break
+#               movies_to_add.append([movie['id'], movie['title'], ACTOR_VAL])
+            ####
+            # How do I tell between a director and a writer or actor?
+            ####
+            if 'director' in person:
+               print person['name'],' as a director!'
+            if 'writer' in person:
+               print person['name'],' as a writer!'
+         elif entity[0] == 'GENRE':
+         elif entity[0] == 'MOVIE':
+   # CULL
+   data['recs'].sort(key=lambda x: x[2], reverse=True)
+   del data['recs'][20:]
+
 def trivia(data):
 	# dynamically direct the function call based on the trivia type
 	# to introduce a new type, just create a function with the same name
