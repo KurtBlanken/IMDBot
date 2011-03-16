@@ -1,7 +1,5 @@
 #!/usr/bin/env python
 import os, sys
-from threading import Thread
-import subprocess
 import json
 import NLU, DM
 import imdbi
@@ -25,6 +23,7 @@ if len(sys.argv) > 1 and sys.argv[1] == 'server':
   # output
   _, w = os.pipe()
   sys.stdout = os.fdopen(w, 'w')
+  print sys.stdin
 
 imdb = imdbi.IMDBInterface()
 if not server:
@@ -63,7 +62,7 @@ while 1:
       data[key] = list(value)
   NLU.add_entity_names(data)
   del data['imdbi']
-  result = json.dumps(data)
+  result = json.dumps(imdbi.clean_unicode_errors(data))
   if server:
     sys.stderr.write('> ' + user_utterance + '\n')
     sys.stderr.write('< ' + result + '\n')

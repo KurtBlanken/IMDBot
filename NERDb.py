@@ -1,168 +1,115 @@
+import os
 import nltk
-from nltk.corpus import conll2000, brown
 import Levenshtein as lev
-import cPickle
 import re
-
-class ConsecutiveNPChunker(nltk.ChunkParserI):
-  def __init__(self, tagger, chunked_sents):
-    tagged_sents = [[((w,t),c) for (w, t, c) in
-                     nltk.chunk.tree2conlltags(sent)]
-                    for sent in chunked_sents]                
-    train_set = []
-    for tagged_sent in tagged_sents:
-      untagged_sent = nltk.tag.untag(tagged_sent)
-      history = []
-      for i, (word, tag) in enumerate(tagged_sent):
-        featureset = npchunk_features(untagged_sent, i, history)
-        train_set.append((featureset, tag))
-        history.append(tag)
-    labels = set(label for (tok,label) in train_set)
-    nltk.config_megam('./megam_i686.opt')
-    self.classifier = nltk.MaxentClassifier.train(train_set, algorithm='megam')
-    self.tagger = tagger
-    
-  def parse(self, sentence):
-    tagged_sent = nltk.pos_tag(re.split(r'[ \n!#$%&\*^()/?.]+', sentence))
-    history = []
-    for i, word in enumerate(tagged_sent):
-      featureset = npchunk_features(tagged_sent, i, history)
-      tag = self.classifier.classify(featureset)
-      history.append(tag)
-    chunked_sent = zip(tagged_sent, history)
-    conlltags = [(w,t,c) for ((w,t),c) in chunked_sent]
-    return nltk.chunk.conlltags2tree(conlltags)
+import imdbi
+import cPickle
+import stanford_parser
 
 class NERDb():
+
 	def __init__(self):
-		try:
-			tagger = cPickle.load(open('pickles/nerdb_tagger.pkl'))
-		except IOError:
-			print 'failed to load nerdb_tagger, recreating...'
-			train_sents = conll2000.tagged_sents() + brown.tagged_sents()
-			tagger = nltk.DefaultTagger('NN')
-			tagger = nltk.UnigramTagger(train_sents, backoff=tagger)
-			tagger = nltk.BigramTagger(train_sents, backoff=tagger)
-			tagger = nltk.TrigramTagger(train_sents, backoff=tagger)
-			cPickle.dump(tagger, open('pickles/nerdb_tagger.pkl', 'w'))
-			print 'done'
-		try:
-			chunker = cPickle.load(open('pickles/nerdb_chunker.pkl'))
-		except IOError:
-			print 'failed to load nerdb_chunker, recreating...'
-			train_sents = conll2000.chunked_sents()
-			chunker = ConsecutiveNPChunker(tagger, train_sents)
-			cPickle.dump(chunker, open('pickles/nerdb_chunker.pkl', 'w'))
-			print 'done'
-		self.chunker = chunker
-		self.people = [line.strip().split(" ", 1) for line in open('data/actors_index.txt').readlines()]
-		self.people += [line.strip().split(" ", 1) for line in open('data/actresses_index.txt').readlines()]
-		self.people += [line.strip().split(" ", 1) for line in open('data/other_people.txt').readlines()]
-		for i, (id, person) in enumerate(self.people):
-			names = person.split(',')
-			names = map(lambda name: name.strip(), names)
-			names.reverse()
-			name = ' '.join(names).lower()
-			self.people[i] = (long(id), name)
-		self.movies = [line.strip().split(" ", 1) for line in open('data/title_index.txt').readlines()]
-		self.movies = map(lambda (id, movie): (long(id), movie.lower()), self.movies)
-		self.genres = [line.strip().split(" ", 1) for line in open('data/genres.txt').readlines()]
-		self.entity_types = {'PERSON' : self.people, 'MOVIE' : self.movies, 'GENRE' : self.genres}
-		self.numbers = eval(open('data/numbers.txt').read())
-		 
-	def search(self, s, t):
-		for type_name, entities in self.entity_types.items():
-			matches = find_matches(s.lower(), type_name, entities, t)
-			if len(matches) > 0:
-				return matches[0][1]
+		a = imdbi.IMDBInterface()
+		if not os.path.exists('pickles/people_cache.pkl'):
+			people = a.get_persons()
+			people_cache = {}
+			for id, name in people:
+				if ', ' not in name:
+					print name
+					continue
+				last, first = name.split(', ')
+				last = last.lower()
+				first = first.lower()
+				if first not in people_cache:
+					people_cache[first] = {}
+				people_cache[first][last] = id
+			cPickle.dump(people_cache, open('pickles/people_cache.pkl', 'w'))
+		else:
+			people_cache = cPickle.load(open('pickles/people_cache.pkl'))
+		self.a = a
+		self.people_cache = people_cache
+		self.genres = {}
+		for genre, keyword in [line.strip().split() for line in open('data/genres.txt').readlines()]:
+			self.genres[keyword] = genre
+		prefs = [line.strip() for line in open('data/preferences.txt').readlines() if len(line.strip()) > 0]
+		self.pos_words = set(prefs[prefs.index("# pos")+1:prefs.index("# neg")])
+		self.neg_words = set(prefs[prefs.index("# neg")+1:])
+		self.parser = stanford_parser.StanfordParser()
+		
+	def search_person(self, first, last):
+		first = first.lower()
+		last = last.lower()
+		if first in self.people_cache:
+			firsts = self.people_cache[first]
+			if last in firsts:
+				return self.people_cache[first][last]
+			else:
+				ratios = []
+				for _last in firsts.keys():
+					r = lev.ratio(str(last), str(_last))
+					ratios.append((r, firsts[_last]))
+				ratios.sort(key=lambda x: x[0], reverse=True)
+				return ratios[0][1]
 		return None
+		
+	def search_movie(self, keywords):
+		self.a.cur.execute("SELECT id, title FROM title WHERE title LIKE '%{0}%'".format('%'.join(keywords)))
+		matches = []
+		for (id, match) in self.a.cur.fetchall():
+			matches.append((lev.ratio(str(' '.join(keywords)), str(match)), id, match))
+		matches.sort(key=lambda x: x[0], reverse=True)
+		if matches:
+			return matches[0][1]
+		return None
+		
+	def search_genres(self, keywords):
+		genres = []
+		for keyword in keywords:
+			if keyword in self.genres:
+				genres.append(self.genres[keyword])
+		return genres
 
-	def get_entities(self, sentence):
-		found = set()
-		sent_list= []
-		sent_list.append(sentence)
-		# check for numbers to check if there are matches
-		words= re.split(r'[ \n!#$%&\*^()/.?]+',sentence)
-		for word in words:
-			if word.isdigit():
-				if word in self.numbers:
-					replaced = sentence.replace(word, self.numbers[word].title())
-					sent_list.append(replaced) 			
-		for sentence in sent_list:
-		 	tree = self.chunker.parse(sentence)
-		 	for child in tree.subtrees():
-		 		if child.node == 'NP':
-		 			match = self.search(' '.join(map(lambda x: x[0], child.leaves())), 0.99)
-		 			if match:
-		 				found.add(match)
-		 	tokens = re.split(r'[ \n!#$%&\*^()/.?]+',sentence)
-		 	for i in range(len(tokens)):
-		 		for j in range(len(tokens)):
-		 			if i+j+1 < len(tokens):
-		 				substring = ' '.join(tokens[i:i+j+1])
-		 				match = self.search(substring, 0.99)
-		 				if match:
-		 					found.add(match)
-		# remove any entities that are substrings of another entity
-		dupes = set()
-		for entity1 in found:
-			for entity2 in found:
-				if entity1 not in dupes and entity2 not in dupes:
-					t1, id1, name1 = entity1
-					t2, id2, name2 = entity2
-					if id1 != id2:
-						names1 = name1.split()
-						names2 = name2.split()
-						d = []
-						for n1 in names1:
-							for n2 in names2:
-								d.append(lev.ratio(n1, n2))
-						if max(d) > 0.8 and t1 != 'GENRE':
-							if len(name2) > len(name1):
-								dupes.add(entity1)
-							else:
-								dupes.add(entity2)
-		return found.difference(dupes)
+	def get_entities_and_prefs(self, sentence):
+		tree, deps = self.parser.parse(sentence)
+		entities = []
+		for subtree in tree.subtrees(filter=lambda tree: tree.node == 'NP'):
+			if list(subtree.subtrees(filter=lambda tree: tree.node == 'PRP')):
+				continue
+			keywords = subtree.leaves()
+			key_string = ' '.join(keywords)
+			matches = []
+			if len(keywords) == 2:
+				person = self.search_person(keywords[0], keywords[1])
+				if person:
+					matches.append(('PERSON', person))
+			movie = self.search_movie(keywords)
+			if movie:
+				matches.append(('MOVIE', movie))
+			genres = self.search_genres(keywords)
+			if genres:
+				entities += [('GENRE', genre, key_string) for genre in genres]
+			for t, id in matches:
+				r = 1.0
+				if t == 'PERSON':
+					name = self.a.get_person(id, cast_info=False)['name']
+					r = lev.ratio(str(key_string), str(name))
+				elif t == 'MOVIE':
+					title = self.a.get_movie(id, aka_info=False, movie_info=False, cast_info=False)['title']
+					r = lev.ratio(str(key_string), str(title))
+				if r > 0.9:
+					entities.append((t, id, key_string))
+		#todo: remove false-positive entities, check for quoted entity names
+		pos = set()
+		neg = set()
+		for dep_type, parent, i1, child, i2 in deps:
+			if parent in self.pos_words:
+				pass
+			elif parent in self.neg_words:
+				pass
+		return entities, pos, neg
 
-def tags_since_dt(sentence, i):
-  tags = set()
-  for word, pos in sentence[:i]:
-    if pos == 'DT':
-      tags = set()
-    else:
-      tags.add(pos)
-  return '+'.join(sorted(tags))
-  
-def npchunk_features(sentence, i, history):
-  word, pos = sentence[i]
-  if i == 0:
-    prevword, prevpos = "<START>", "<START>"
-  else:
-    prevword, prevpos = sentence[i-1]
-  if i == len(sentence)-1:
-    nextword, nextpos = "<END>", "<END>"
-  else:
-    nextword, nextpos = sentence[i+1]
-  return {
-    'pos' : pos,
-    'word' : word,
-    'prevword' : prevword,
-    'prevpos' : prevpos,
-    'nextpos' : nextpos,
-    'nextword' : nextword,
-    'tags-since-dt' : tags_since_dt(sentence, i),
-  }
-
-def find_matches(s, type_name, entities, t):
-  matches = []
-  for id, entity in entities:
-    r = lev.ratio(s, entity)
-    if r > t:
-      matches.append((r, (type_name, id, entity)))
-  matches.sort(key=lambda x: x[1], reverse=True)
-  return matches
-
-def test():
+'''
+def schema_test():
   import random
   nerdb = NERDb()
   entity_types = {}
@@ -221,26 +168,18 @@ def test():
     len(schemas), sentences, (end-start)/sentences)
   print '{0} missed from {1} possible ({2:.0f}%)'.format(err, count, (err/float(count))*100)
   print '{0} sentences with false positives ({1:.0f}%)'.format(fperr, (fperr/float(sentences))*100)
+'''
+  
+def test():
+   db = NERDb()
+   print 'Welcome to the IMDBot NERDb'
+   while 1:
+   	try:
+   		s = raw_input("> ")
+   		print db.get_entities_and_deps(s)
+   	except EOFError:
+   		sys.exit(0)
 
 if __name__ == '__main__':
+	import sys
 	test()
-
-'''
-Ablation Study Results (PERSON and MOVIE types only):
-  Baseline (everything on):
-    ned results for 7 schemas, 700 sentences total, 0.75 seconds/result
-    6 missed from 900 possible (1%)
-    53 sentences with false positives (8%)
-  Max sub-token length len(tokens)/2:
-    ned results for 7 schemas, 700 sentences total, 0.48 seconds/result
-    39 missed from 900 possible (4%)
-    55 sentences with false positives (8%)
-  Chunk matching only:
-    ned results for 7 schemas, 700 sentences total, 0.05 seconds/result
-    327 missed from 900 possible (36%)
-    51 sentences with false positives (7%)
-  Sub-tokens only:
-    ned results for 7 schemas, 700 sentences total, 0.72 seconds/result
-    101 missed from 900 possible (11%)
-    21 sentences with false positives (3%)
-'''

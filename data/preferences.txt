@@ -68,7 +68,9 @@ care
 honour
 value
 esteem
+favorite
 # neg
+don't like
 stupid
 ugly
 bad

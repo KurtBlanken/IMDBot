@@ -7,10 +7,34 @@ born, PERSON | when
 play, PERSON, MOVIE | role
 played, PERSON, MOVIE | role
 role, PERSON, MOVIE | role
+do, PERSON, MOVIE | role
+known, for, PERSON, MOVIE | role
+job, PERSON, MOVIE | role
+budget, MOVIE | budget
+gross, MOVIE | gross
+money, make, MOVIE | gross
+money, took, MOVIE | budget
+runtime, MOVIE | runtime
+long, MOVIE | runtime
+time, MOVIE | runtime
+minutes, MOVIE | runtime
 director, MOVIE | director
 directed, MOVIE | director
 produced, MOVIE | producer
 producer, MOVIE | producer
+acted, PERSON | recent
+director, PERSON | recent_director
+directed, PERSON | recent_director
+produced, PERSON | recent_producer
+producer, PERSON | recent_producer
+director, PERSON, GENRE | recent_director_same
+directed, PERSON, GENRE | recent_director_same
+produced, PERSON, GENRE | recent_producer_same
+producer, PERSON, GENRE | recent_producer_same
+director, not, PERSON, GENRE | recent_director_not
+directed, not, PERSON, GENRE | recent_director_not
+produced, not, PERSON, GENRE | recent_producer_not
+producer, not, PERSON, GENRE | recent_producer_not
 producer, PERSON, MOVIE | was_producers
 produce, PERSON, MOVIE | was_producers
 produced, PERSON, MOVIE | was_producers
@@ -22,6 +46,13 @@ has, MOVIE, PERSON | was
 had, MOVIE, PERSON | was
 had, PERSON | recent
 been, PERSON | recent
+had, PERSON, GENRE | recent_actor_same
+been, PERSON, GENRE | recent_actor_same
+had, PERSON, not, GENRE | recent_actor_not
+been, PERSON, not, GENRE | recent_actor_not
 screened, MOVIE | when
 many, been, in, PERSON | count_films
 PERSON | recent
+was, not, right | erase
+wasn't, right | erase
+was, wrong | erase
